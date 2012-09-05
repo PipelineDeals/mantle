@@ -1,3 +1,9 @@
+PATH
+  remote: /Users/theoddlinguist/code/asari
+  specs:
+    asari (0.7.0)
+      httparty
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -29,8 +35,6 @@ GEM
       i18n (~> 0.6)
       multi_json (~> 1.0)
     arel (3.0.2)
-    asari (0.7.0)
-      httparty
     builder (3.0.0)
     coffee-rails (3.2.2)
       coffee-script (>= 2.2.0)
@@ -124,7 +128,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  asari
+  asari!
   coffee-rails (~> 3.2.1)
   jquery-rails
   rails (= 3.2.7)

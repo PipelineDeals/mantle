@@ -1,2 +1,2 @@
-Asari.mode = :sandbox
-$asari = Asari.new("search-domain-goes-here")
+Asari.mode = :production
+$asari = Asari.new("searchtest-ny4emoak65gm6zefgxrcfu7tiy")

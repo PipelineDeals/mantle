@@ -17,5 +17,5 @@ gem 'rspec', groups: [:test, :development]
 gem 'rspec-rails', groups: [:test, :development]
 
 gem 'redis'
-gem 'asari'
+gem 'asari', path: '/Users/theoddlinguist/code/asari'
 

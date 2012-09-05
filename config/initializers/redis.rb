@@ -5,8 +5,8 @@ $redis = Redis.new
 namespace = "jupiter"
 handler = ModelHandler.new
 
-models = %w{person company deal note}
-actions = %w{create update delete}
+models = %w{person contact lead company deal note}
+actions = %w{create update destroy}
 
 channels = []
 models.each do |model|
