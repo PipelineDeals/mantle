@@ -32,5 +32,8 @@ class ModelHandler
       # puts 'DELETING'
       $asari.remove_item(id, Time.now.to_i)
     end
+
+    # Save timestamp to database
+    Settings.last_success = Time.now.to_i
   end
 end

@@ -19,3 +19,5 @@ gem 'rspec-rails', groups: [:test, :development]
 
 gem 'redis'
 gem 'asari', git: 'git://github.com/TheOddLinguist/asari.git'
+
+gem 'ledermann-rails-settings', :require => 'rails-settings'

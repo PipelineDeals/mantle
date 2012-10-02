@@ -1,0 +1,1 @@
+Settings.defaults[:last_success] = nil
