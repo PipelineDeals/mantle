@@ -1,6 +1,7 @@
 require 'redis'
 
-$redis = Redis.new
+# $redis = Redis.new
+$redis = Redis.new(:host => 'topic-staging.pipelinedealsco.com')
 
 namespace = "jupiter"
 handler = ModelHandler.new
