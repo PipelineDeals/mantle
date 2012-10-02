@@ -1,10 +1,32 @@
 require 'redis'
 
-# $redis = Redis.new
-$redis = Redis.new(:host => 'topic-staging.pipelinedealsco.com')
+##
+# Configure Redis
+##
+
+$redis = Redis.new
+# $redis = Redis.new(:host => 'topic-staging.pipelinedealsco.com')
 
 namespace = "jupiter"
 handler = ModelHandler.new
+
+##
+# Lookup missed messages
+##
+
+keys = $redis.keys('jupiter:action_list:*')
+keys.each do |key|
+  ns, list, timestamp, model, action, id = key.split(':')
+  if timestamp.to_f > 1349147313.266263 # TODO Change to dynamically saved value
+    channel = "#{namespace}:#{action}:#{model}"
+    message = $redis.get key
+    handler.call(channel, message)
+  end
+end
+
+##
+# Setup service for new incoming messages
+##
 
 models = %w{person contact lead company deal note}
 actions = %w{create update destroy}
