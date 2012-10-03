@@ -39,11 +39,7 @@ class RedisRunner
       actions = %w{create update destroy}
 
       channels = []
-      models.each do |model|
-        actions.each do |action|
-          channels << "#{action}:#{model}"
-        end
-      end
+      models.each { |model| actions.each { |action| channels << "#{action}:#{model}" } }
 
       # TODO Didn't work
       # channels = models.map { |model| actions.map { |action| "#{action}:#{model}" } }
@@ -53,11 +49,7 @@ class RedisRunner
   end
 
   def compare_times(t1, t2)
-    for i in 0...t1.length
-      if t1[i] != t2[i]
-        return i
-      end
-    end
+    for i in 0...t1.length do return i if t1[i] != t2[i] end
     false
   end
 end
