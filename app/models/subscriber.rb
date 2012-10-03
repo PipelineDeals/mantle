@@ -6,7 +6,7 @@ class Subscriber
   end
 
   def listen
-    $redis.subscribe *namespaced_channels do |on|
+    redis.subscribe *namespaced_channels do |on|
       on.message do |channel, message|
         receive(channel, message)
       end
