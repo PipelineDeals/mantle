@@ -23,3 +23,6 @@ gem 'asari', git: 'git://github.com/TheOddLinguist/asari.git'
 gem 'ledermann-rails-settings', :require => 'rails-settings'
 
 gem 'sidekiq'
+
+gem 'sinatra', require: false
+gem 'slim'

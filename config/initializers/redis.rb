@@ -2,14 +2,14 @@ require 'redis'
 
 class RedisRunner
   def initialize
-    $redis = Redis.new#(:host => 'topic-staging.pipelinedealsco.com')
+    $redis = Redis.new#(:host => 'redis.pipelinedealsco.com')
     @namespace = 'jupiter'
     @handler = ModelHandler.new
   end
 
   def run!
-    catchup
-    start_listener
+    # catchup
+    start_listener if ENV['SUB'] == 'true'
   end
 
   private

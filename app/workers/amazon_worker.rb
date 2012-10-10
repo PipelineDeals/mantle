@@ -36,6 +36,6 @@ class AmazonWorker
 
     # Save timestamp to database
     # TODO Not thread-safe...does it matter?
-    Settings.last_success = Time.now.to_i
+    # Settings.last_success = Time.now.to_i
   end
 end
