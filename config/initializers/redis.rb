@@ -2,7 +2,7 @@ require 'redis'
 
 class RedisRunner
   def initialize
-    $redis = Redis.new#(:host => 'redis.pipelinedealsco.com')
+    $redis = Redis.new(:host => 'redis.pipelinedealsco.com')
     @namespace = 'jupiter'
     @handler = ModelHandler.new
   end

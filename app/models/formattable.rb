@@ -15,7 +15,7 @@ module Formattable
       elsif [:phone, :mobile, :home_phone].include? field then
         obj_fields[field.to_s] = object[field.to_s].gsub(/[^0-9]/i, '') if object[field.to_s].present?
       else
-        obj_fields[field.to_s] = encode_text(object[field.to_s]) if object[field.to_s].present?
+        obj_fields[field.to_s] = object[field.to_s] if object[field.to_s].present?
       end
     end
     obj_fields
