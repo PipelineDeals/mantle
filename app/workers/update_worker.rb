@@ -1,3 +1,3 @@
-class UpdateWorker < AmazonWorker
+class UpdateWorker < Worker
   sidekiq_options :queue => :update
 end
