@@ -6,4 +6,3 @@ gem 'sinatra', :require => false
 gem 'sidekiq'
 
 gem 'rspec', groups: [:test, :development]
-gem 'rspec-rails', groups: [:test, :development]
