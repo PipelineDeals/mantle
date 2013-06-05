@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-gem 'rails', '3.2.7'
+gem 'rails'
 
 gem 'sqlite3'
 
@@ -18,11 +18,7 @@ gem 'rspec', groups: [:test, :development]
 gem 'rspec-rails', groups: [:test, :development]
 
 gem 'redis'
-gem 'asari', git: 'git://github.com/TheOddLinguist/asari.git'
 
 gem 'ledermann-rails-settings', :require => 'rails-settings'
 
 gem 'sidekiq'
-
-gem 'sinatra', require: false
-gem 'slim'
