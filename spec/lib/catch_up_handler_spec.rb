@@ -34,5 +34,28 @@ describe Mantle::CatchUpHandler do
       end
     end
   end
+
+  describe "#sort_keys" do
+    let(:keys) { ["jupiter:action_list:1370533530.12034:contact:update:106", "jupiter:action_list:1370533458.10278:contact:update:107", "jupiter:action_list:1370533534.67259:contact:update:103", "jupiter:action_list:1370533526.42493:contact:update:108"] }
+    let(:sorted_keys) { ["jupiter:action_list:1370533458.10278:contact:update:107", "jupiter:action_list:1370533526.42493:contact:update:108", "jupiter:action_list:1370533530.12034:contact:update:106", "jupiter:action_list:1370533534.67259:contact:update:103"] }
+
+    it "should sort the keys" do
+      handler.sort_keys(keys).should eql(sorted_keys)
+    end
+  end
+
+  describe "#get_keys_to_catch_up_on" do
+    let(:keys) { ["jupiter:action_list:1370533530.12034:contact:update:106", "jupiter:action_list:1370533458.10278:contact:update:107", "jupiter:action_list:1370533534.67259:contact:update:103", "jupiter:action_list:1370533526.42493:contact:update:108"] }
+    let(:keys_not_seen) { ["jupiter:action_list:1370533530.12034:contact:update:106", "jupiter:action_list:1370533534.67259:contact:update:103"] }
+
+    it "should find the right keys" do
+      handler.stub(:last_success_time).and_return(Time.at(1370533_529))
+      Time.stub(:now).and_return(Time.at(1370533_560))
+      handler.outside_listener.stub(:keys).with("#{Mantle::CatchUpHandler::ActionListName}:13705335*").and_return(keys_not_seen)
+      handler.get_keys_to_catch_up_on.should eql(keys_not_seen)
+    end
+
+
+  end
 end
 

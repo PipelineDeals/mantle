@@ -4,6 +4,7 @@ require 'sidekiq'
 require 'json'
 
 require 'local_redis'
+require 'message_router'
 require 'catch_up_handler'
 require 'outside_redis_listener'
 require_relative 'workers/worker'

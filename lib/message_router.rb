@@ -6,7 +6,6 @@ module Mantle
 
     def route!
       action = @channel.split(':')[1] # TODO Repetitive?
-
       klass = case action
       when 'create'
         object = JSON.parse(@message)['data']
@@ -19,8 +18,10 @@ module Mantle
         UpdateWorker
       when 'destroy'
         DeleteWorker
+      else
+        raise ArgumentError, "Unknown action #{action}"
       end
-      klass.perform_async(@channel, @message)
+      klass.perform_async(@channel, JSON.parse(@message))
     end
   end
 end

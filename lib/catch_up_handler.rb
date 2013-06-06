@@ -1,5 +1,7 @@
 module Mantle
   class CatchUpHandler
+    ActionListName = "jupiter:action_list"
+    attr_accessor :outside_listener
     def initialize(outside_listener)
       @outside_listener = outside_listener
       @redis = LocalRedis.new
@@ -8,14 +10,18 @@ module Mantle
     def catch_up!
       return if last_success_time.nil?
       keys = get_keys_to_catch_up_on
-      handle_messages_since_last_success(keys)
+      handle_messages_since_last_success(sort_keys(keys))
+    end
+
+    def sort_keys(keys)
+      keys.sort {|k1, k2| k1.split(":")[2].to_f <=> k2.split(":")[2].to_f }
     end
 
     def get_keys_to_catch_up_on
       sig_length = compare_times(Time.now.to_i.to_s, last_success_time.to_i.to_s)
-      return unless sig_length.present?
-      prefix = time.to_i.to_s[0, sig_length]
-      @outside_listener.keys("jupiter:action_list:#{prefix}*")
+      return unless sig_length
+      prefix = last_success_time.to_i.to_s[0, sig_length]
+      @outside_listener.keys("#{ActionListName}:#{prefix}*")
     end
 
     def compare_times(t1, t2)
@@ -32,8 +38,8 @@ module Mantle
     def handle_messages_since_last_success(keys)
       keys.each do |key|
         ns, list, timestamp, model, action, id = key.split(':')
-        if timestamp.to_f > last_success_time
-          channel = "#{@namespace}:#{action}:#{model}"
+        if timestamp.to_f > last_success_time.to_f
+          channel = "#{ns}:#{action}:#{model}"
           message = @redis.get key
           MessageRouter.new(channel, message).route!
         end
