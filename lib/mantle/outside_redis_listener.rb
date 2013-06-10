@@ -1,5 +1,3 @@
-require 'redis'
-
 module Mantle
   class OutsideRedisListener
     SubscribedModels = %w{person contact lead company deal note comment}
@@ -26,9 +24,14 @@ module Mantle
       SubscribedModels.each { |model| SubscribedActions.each { |action| channels << "#{@namespace}:#{action}:#{model}" } }
       @outside_redis.subscribe channels do |on|
         on.message do |channel, message|
+          $stdout << "Message! #{channel} #{message.inspect}\n"
           MessageRouter.new(channel, message).route!
         end
       end
+    end
+
+    def keys(keys)
+      @outside_redis.keys(keys)
     end
   end
 end

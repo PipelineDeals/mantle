@@ -12,6 +12,12 @@ module Mantle
           conn.get('last_successful_message_received')
         end
       end
+
+      def get(key)
+        Sidekiq.redis do |conn|
+          conn.get key
+        end
+      end
     end
   end
 end

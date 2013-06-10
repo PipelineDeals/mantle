@@ -54,8 +54,6 @@ describe Mantle::CatchUpHandler do
       handler.outside_listener.stub(:keys).with("#{Mantle::CatchUpHandler::ActionListName}:13705335*").and_return(keys_not_seen)
       handler.get_keys_to_catch_up_on.should eql(keys_not_seen)
     end
-
-
   end
 end
 

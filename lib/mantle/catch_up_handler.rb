@@ -4,11 +4,12 @@ module Mantle
     attr_accessor :outside_listener
     def initialize(outside_listener)
       @outside_listener = outside_listener
-      @redis = LocalRedis.new
     end
 
     def catch_up!
+      $stdout << "Catching up...\n"
       return if last_success_time.nil?
+      $stdout << "Catching up from #{last_success_time}\n"
       keys = get_keys_to_catch_up_on
       handle_messages_since_last_success(sort_keys(keys))
     end
@@ -32,7 +33,7 @@ module Mantle
     end
 
     def last_success_time
-      @redis.last_message_successfully_received_at
+      LocalRedis.last_message_successfully_received_at
     end
 
     def handle_messages_since_last_success(keys)
@@ -40,7 +41,7 @@ module Mantle
         ns, list, timestamp, model, action, id = key.split(':')
         if timestamp.to_f > last_success_time.to_f
           channel = "#{ns}:#{action}:#{model}"
-          message = @redis.get key
+          message = LocalRedis.get key
           MessageRouter.new(channel, message).route!
         end
       end
