@@ -8,7 +8,7 @@ require_relative 'mantle/message_router'
 require_relative 'mantle/catch_up_handler'
 require_relative 'mantle/outside_redis_listener'
 require_relative 'mantle/message_handler'
-require_relative 'workers'
+require_relative 'mantle/workers'
 
 module Mantle
   def self.run!
