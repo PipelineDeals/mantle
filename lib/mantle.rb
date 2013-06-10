@@ -16,15 +16,15 @@ module Mantle
     OutsideRedisListener.new(:namespace => 'jupiter').run!
   end
 
-  def message_handler=(handler)
+  def self.message_handler=(handler)
     @message_handler = handler
   end
 
-  def message_handler
+  def self.message_handler
     @message_handler || MessageHandler
   end
 
-  def receive_message(action,name,message)
+  def self.receive_message(action,name,message)
     @message_handler.receive(action,name,message)
   end
 
