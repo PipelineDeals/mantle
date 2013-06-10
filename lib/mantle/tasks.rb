@@ -1,5 +1,6 @@
 require 'sidekiq'
 require 'sidekiq/cli'
+require 'mantle/sidekiq_overrides'
 namespace :mantle do
   desc "Runs the listener to listen for changes to things in PipelineDeals"
   task :listen do
