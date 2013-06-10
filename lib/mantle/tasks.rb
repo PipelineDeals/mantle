@@ -8,7 +8,7 @@ namespace :mantle do
 
   desc "Runs the sidekiq process to process messages locally"
   task :process do
-    Sidekiq.options = {require: 'mantle/workers', queues: 'create_nonimport,create_import,update,delete' }
+    Sidekiq.options = {require: 'mantle/load_workers', queues: 'create_nonimport,create_import,update,delete' }
     cli = Sidekiq::CLI.instance
     cli.parse
     cli.run
