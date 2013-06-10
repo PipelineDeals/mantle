@@ -16,5 +16,19 @@ module Sidekiq
       #   die(1)
       # end
     end
+
+    def boot_system
+      ENV['RACK_ENV'] = ENV['RAILS_ENV'] = environment
+
+      if File.directory?(options[:require])
+        require 'rails'
+        require 'sidekiq/rails'
+        require File.expand_path("#{options[:require]}/config/environment.rb")
+        ::Rails.application.eager_load!
+        options[:tag] ||= default_tag
+      else
+        require options[:require]
+      end
+    end
   end
 end
