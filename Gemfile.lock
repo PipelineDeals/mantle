@@ -1,3 +1,13 @@
+PATH
+  remote: .
+  specs:
+    mantle (0.0.2)
+      json
+      redis
+      sidekiq
+      sinatra
+      slim
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -49,6 +59,7 @@ PLATFORMS
 
 DEPENDENCIES
   json
+  mantle!
   pry
   redis
   rspec

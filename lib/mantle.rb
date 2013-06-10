@@ -8,9 +8,7 @@ require_relative 'mantle/message_router'
 require_relative 'mantle/catch_up_handler'
 require_relative 'mantle/outside_redis_listener'
 require_relative 'mantle/message_handler'
-require_relative 'workers/worker'
-
-Dir[File.dirname(__FILE__) + '/workers/*.rb'].each {|file| require file }
+require_relative 'workers'
 
 module Mantle
   def self.run!
