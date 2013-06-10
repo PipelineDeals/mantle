@@ -8,8 +8,8 @@ Gem::Specification.new do |gem|
   gem.version       = Mantle::VERSION
   gem.authors       = ["Grant Ammons"]
   gem.email         = ["gammons@gmail.com"]
-  gem.description   = %q{TODO: Write a gem description}
-  gem.summary       = %q{TODO: Write a gem summary}
+  gem.description   = %q{mantle is mantling.}
+  gem.summary       = %q{you know it!}
   gem.homepage      = ""
 
   gem.files         = `git ls-files`.split($/)
