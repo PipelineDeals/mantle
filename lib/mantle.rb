@@ -3,16 +3,9 @@ require 'redis'
 require 'sidekiq'
 require 'json'
 
-require_relative './mantle/local_redis'
-require_relative 'mantle/message_router'
-require_relative 'mantle/catch_up_handler'
-require_relative 'mantle/outside_redis_listener'
-require_relative 'mantle/message_handler'
-require_relative 'mantle/load_workers'
 
 module Mantle
   def self.run!
-    setup_sidekiq
     OutsideRedisListener.new(:namespace => 'jupiter').run!
   end
 
@@ -25,7 +18,8 @@ module Mantle
   end
 
   def self.receive_message(action,name,message)
-    @message_handler.receive(action,name,message)
+    $stdout << "RECEIVE MESSAGE!\n"
+    message_handler.receive(action,name,message)
   end
 
   private
@@ -39,3 +33,10 @@ module Mantle
     end
   end
 end
+
+require_relative 'mantle/local_redis'
+require_relative 'mantle/message_router'
+require_relative 'mantle/catch_up_handler'
+require_relative 'mantle/outside_redis_listener'
+require_relative 'mantle/message_handler'
+require_relative 'mantle/load_workers'
