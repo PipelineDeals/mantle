@@ -1,6 +1,6 @@
 require 'spec_helper'
 describe Mantle::CatchUpHandler do
-  let(:handler) { Mantle::CatchUpHandler.new(stub) }
+  let(:handler) { Mantle::CatchUpHandler.new(double) }
 
   describe "#compare_times" do
     context "when the times are the same" do
