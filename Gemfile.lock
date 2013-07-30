@@ -58,11 +58,6 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  json
   mantle!
   pry
-  redis
   rspec
-  sidekiq
-  sinatra
-  slim
