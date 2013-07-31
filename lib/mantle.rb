@@ -11,7 +11,6 @@ require_relative 'mantle/message_handler'
 require_relative 'mantle/load_workers'
 
 module Mantle
-  extend Configuration
   class << self
     attr_accessor :subscription_channels
 
