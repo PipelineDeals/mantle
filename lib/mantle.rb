@@ -3,23 +3,43 @@ require 'redis'
 require 'sidekiq'
 require 'json'
 
+require_relative 'mantle/local_redis'
+require_relative 'mantle/message_router'
+require_relative 'mantle/catch_up_handler'
+require_relative 'mantle/outside_redis_listener'
+require_relative 'mantle/message_handler'
+require_relative 'mantle/load_workers'
 
 module Mantle
-  def self.run!
-    OutsideRedisListener.new(:namespace => 'jupiter').run!
-  end
+  extend Configuration
+  class << self
+    attr_accessor :subscription_channels
 
-  def self.message_handler=(handler)
-    @message_handler = handler
-  end
+    # Mantle.configure do |config|
+    #   config.subscription_channels = ['update:deal', 'create:person']
+    # end
+    #
+    def configure
+      yield self
+      true
+    end
 
-  def self.message_handler
-    @message_handler || MessageHandler
-  end
+    def run!
+      OutsideRedisListener.new(:namespace => 'jupiter').run!
+    end
 
-  def self.receive_message(action, name, message)
-    $stdout << "RECEIVE MESSAGE!\n"
-    message_handler.receive(action, name, message)
+    def message_handler=(handler)
+      @message_handler = handler
+    end
+
+    def message_handler
+      @message_handler || MessageHandler
+    end
+
+    def receive_message(action, name, message)
+      $stdout << "RECEIVE MESSAGE!\n"
+      message_handler.receive(action, name, message)
+    end
   end
 
   private
@@ -32,11 +52,6 @@ module Mantle
       config.redis = { :namespace => 'mantle' }
     end
   end
+
 end
 
-require_relative 'mantle/local_redis'
-require_relative 'mantle/message_router'
-require_relative 'mantle/catch_up_handler'
-require_relative 'mantle/outside_redis_listener'
-require_relative 'mantle/message_handler'
-require_relative 'mantle/load_workers'

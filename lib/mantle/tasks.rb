@@ -11,7 +11,7 @@ namespace :mantle do
 
   desc "Runs the sidekiq process to process messages locally"
   task :process do
-    Sidekiq.options = {concurrency: 25, require: 'mantle/load_workers', queues: ['update'] }
+    Sidekiq.options = { concurrency: 25, require: 'mantle/load_workers', queues: ['update'] }
     cli = Sidekiq::CLI.instance
     cli.parse
     cli.run
