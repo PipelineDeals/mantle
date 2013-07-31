@@ -17,9 +17,9 @@ module Mantle
     @message_handler || MessageHandler
   end
 
-  def self.receive_message(action,name,message)
+  def self.receive_message(action, name, message)
     $stdout << "RECEIVE MESSAGE!\n"
-    message_handler.receive(action,name,message)
+    message_handler.receive(action, name, message)
   end
 
   private
