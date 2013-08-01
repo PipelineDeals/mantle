@@ -13,9 +13,7 @@ module Mantle
     end
 
     def self.get(key)
-      Sidekiq.redis do |conn|
-        conn.get key
-      end
+      Sidekiq.redis { |conn| conn.get(key) }
     end
   end
 end

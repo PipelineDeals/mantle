@@ -20,7 +20,7 @@ module Mantle
     def subscribe_to_channels
       @redis.subscribe(@channels) do |on|
         on.message do |channel, message|
-          $stdout << "Message! #{channel} #{message.inspect}\n"
+          $stdout << "Received message on #{channel} #{message.inspect}\n"
           MessageRouter.new(channel, message).route!
         end
       end
