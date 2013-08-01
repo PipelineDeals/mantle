@@ -46,7 +46,7 @@ module Mantle
         _, timestamp, model, action, id = key.split(':')
         if timestamp.to_f > last_success_time.to_f
           channel = "#{action}:#{model}"
-          message = LocalRedis.get(key)
+          message = message_bus_redis.get(key)
           MessageRouter.new(channel, message).route!
         end
       end
