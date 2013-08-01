@@ -6,14 +6,16 @@ require 'json'
 require_relative 'mantle/local_redis'
 require_relative 'mantle/message_router'
 require_relative 'mantle/catch_up_handler'
-require_relative 'mantle/outside_redis_listener'
+require_relative 'mantle/message_bus'
 require_relative 'mantle/message_handler'
 require_relative 'mantle/load_workers'
 
 module Mantle
   class << self
-    attr_accessor :subscription_channels
+    attr_accessor :message_bus_channels, :message_bus_redis
 
+    # SubscribedModels = %w{person contact lead company deal note comment}
+    # SubscribedActions = %w{create update delete}
     # Mantle.configure do |config|
     #   config.subscription_channels = ['update:deal', 'create:person']
     # end
@@ -24,7 +26,7 @@ module Mantle
     end
 
     def run!
-      OutsideRedisListener.new(:namespace => 'jupiter').run!
+      MessageBus.new(message_bus_redis, message_bus_channels).run!
     end
 
     def message_handler=(handler)
