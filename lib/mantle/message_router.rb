@@ -1,12 +1,25 @@
 module Mantle
   class MessageRouter
+    UnknownAction = Class.new(StandardError)
+
     def initialize(channel, message)
-      @channel, @message = channel, message
+      @channel = channel
+      @message = message
+      puts @channel
+      puts @message
     end
 
     def route!
-      action = @channel.split(':')[1] # TODO Repetitive?
-      klass = case action
+      return unless @message
+      action = @channel.split(':')[0]
+      klass = get_worker_from_action(action)
+      klass.perform_async(@channel, JSON.parse(@message))
+    end
+
+    private
+
+    def get_worker_from_action(action)
+      case action
       when 'create'
         object = JSON.parse(@message)['data']
         if object['import_id']
@@ -19,9 +32,9 @@ module Mantle
       when 'destroy'
         DeleteWorker
       else
-        raise ArgumentError, "Unknown action #{action}"
+        raise UnknownAction
       end
-      klass.perform_async(@channel, JSON.parse(@message))
     end
+
   end
 end

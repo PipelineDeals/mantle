@@ -43,9 +43,9 @@ module Mantle
 
     def handle_messages_since_last_success(keys)
       keys.each do |key|
-        ns, list, timestamp, model, action, id = key.split(':')
+        _, timestamp, model, action, id = key.split(':')
         if timestamp.to_f > last_success_time.to_f
-          channel = "#{ns}:#{action}:#{model}"
+          channel = "#{action}:#{model}"
           message = LocalRedis.get(key)
           MessageRouter.new(channel, message).route!
         end
