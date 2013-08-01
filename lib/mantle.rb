@@ -49,6 +49,14 @@ module Mantle
       $stdout << "RECEIVE MESSAGE!\n"
       message_handler.receive(action, model, message)
     end
+
+    def logger
+      Mantle::Logging.logger
+    end
+
+    def logger=(log)
+      Mantle::Logging.logger = log
+    end
   end
 
   private
