@@ -3,6 +3,11 @@ require 'redis'
 require 'sidekiq'
 require 'json'
 
+begin
+  require 'pry'
+rescue LoadError
+end
+
 require_relative 'mantle/local_redis'
 require_relative 'mantle/message_router'
 require_relative 'mantle/catch_up_handler'
@@ -28,10 +33,7 @@ module Mantle
     end
 
     def run!
-      MessageBus.new(
-        redis: message_bus_redis,
-        channels: message_bus_channels
-      ).monitor!
+      MessageBus.new.monitor!
     end
 
     def message_handler=(handler)
