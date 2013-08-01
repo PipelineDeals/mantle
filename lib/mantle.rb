@@ -12,7 +12,7 @@ require_relative 'mantle/load_workers'
 
 module Mantle
   class << self
-    attr_accessor :message_bus_channels, :message_bus_redis
+    attr_accessor :message_bus_channels, :message_bus_redis, :message_bus_catch_up_key_name
 
     # SubscribedModels = %w{person contact lead company deal note comment}
     # SubscribedActions = %w{create update delete}
