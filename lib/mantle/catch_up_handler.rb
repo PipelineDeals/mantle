@@ -1,9 +1,10 @@
 module Mantle
   class CatchUpHandler
-    ActionListName = "jupiter:action_list"
-    attr_accessor :outside_listener
-    def initialize(outside_listener)
-      @outside_listener = outside_listener
+    attr_accessor :message_bus_redis
+
+    def initialize(message_bus_redis = Mantle.message_bus_redis, message_bus_catch_up_key_name = Mantle.message_bus_catch_up_key_name)
+      @message_bus_redis = message_bus_redis
+      @message_bus_catch_up_key_name = message_bus_catch_up_key_name
     end
 
     def catch_up!
@@ -22,7 +23,7 @@ module Mantle
       sig_length = compare_times(Time.now.to_i.to_s, last_success_time.to_i.to_s)
       return unless sig_length
       prefix = last_success_time.to_i.to_s[0, sig_length]
-      @outside_listener.keys("#{ActionListName}:#{prefix}*")
+      message_bus_redis.keys(catch_up_key_names(prefix))
     end
 
     def compare_times(t1, t2)
@@ -30,6 +31,10 @@ module Mantle
       t2 = t2.to_s
       for i in 0...t1.length do return i if t1[i] != t2[i] end
       false
+    end
+
+    def catch_up_key_names(prefix)
+      "#{@message_bus_catch_up_key_name}:#{prefix}*"
     end
 
     def last_success_time
@@ -41,7 +46,7 @@ module Mantle
         ns, list, timestamp, model, action, id = key.split(':')
         if timestamp.to_f > last_success_time.to_f
           channel = "#{ns}:#{action}:#{model}"
-          message = LocalRedis.get key
+          message = LocalRedis.get(key)
           MessageRouter.new(channel, message).route!
         end
       end

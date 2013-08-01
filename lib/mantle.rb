@@ -17,7 +17,9 @@ module Mantle
     # SubscribedModels = %w{person contact lead company deal note comment}
     # SubscribedActions = %w{create update delete}
     # Mantle.configure do |config|
-    #   config.subscription_channels = ['update:deal', 'create:person']
+    #   config.message_bus_channels = ['update:deal', 'create:person']
+    #   config.message_bus_redis = Redis::Namespace.new(:jupiter, :redis => Redis.new)
+    #   config.message_bus_catch_up_key_name = "action_list"
     # end
     #
     def configure
@@ -26,7 +28,10 @@ module Mantle
     end
 
     def run!
-      MessageBus.new(message_bus_redis, message_bus_channels).run!
+      MessageBus.new(
+        redis: message_bus_redis,
+        channels: message_bus_channels
+      ).monitor!
     end
 
     def message_handler=(handler)
