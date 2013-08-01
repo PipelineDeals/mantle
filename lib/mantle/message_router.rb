@@ -5,8 +5,6 @@ module Mantle
     def initialize(channel, message)
       @channel = channel
       @message = message
-      puts @channel
-      puts @message
     end
 
     def route!
