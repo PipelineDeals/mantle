@@ -12,10 +12,11 @@ require_relative 'mantle/catch_up_handler'
 require_relative 'mantle/load_workers'
 require_relative 'mantle/local_redis'
 require_relative 'mantle/message_bus'
-require_relative 'mantle/message_handler'
 require_relative 'mantle/message_router'
 
 module Mantle
+  MissingMessageHandler = Class.new(StandardError)
+
   class << self
     attr_accessor :message_bus_channels, :message_bus_redis, :message_bus_catch_up_key_name
 
@@ -41,7 +42,7 @@ module Mantle
     end
 
     def message_handler
-      @message_handler || MessageHandler
+      @message_handler || begin; raise MissingMessageHandler, "Implement self.receive(action, model, object) and assign class to Mantle.message_handler"; end
     end
 
     def receive_message(action, model, message)
