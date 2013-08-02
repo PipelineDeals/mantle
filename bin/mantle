@@ -1,4 +1,22 @@
 #!/usr/bin/env ruby
 
 require_relative '../lib/mantle'
-puts "This is executable"
+require_relative '../lib/mantle/sidekiq_overrides'
+
+begin
+  require "./initializer"
+rescue LoadError
+  raise "Implement ./initializer.rb in your application root to boot your application and load dependencies"
+end
+
+Mantle.boot_system!
+
+case ARGV[0].strip
+when "listen"
+  Mantle.run!
+when "process"
+  Sidekiq.options = { concurrency: 25, require: 'mantle/load_workers', queues: ['update'] }
+  cli = Sidekiq::CLI.instance
+  cli.parse
+  cli.run
+end

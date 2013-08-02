@@ -54,7 +54,7 @@ module Mantle
       Mantle::Logging.logger = log
     end
 
-    def boot_system
+    def boot_system!
       configure_sidekiq
     end
 
