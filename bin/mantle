@@ -19,7 +19,7 @@ end
 
 Mantle.boot_system!
 
-case ARGV[0].strip
+case ARGV.first.chomp
 when "listen"
   Mantle.run!
 when "process"
