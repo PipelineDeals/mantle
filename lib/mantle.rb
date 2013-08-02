@@ -61,13 +61,21 @@ module Mantle
     private
 
     def configure_sidekiq
+      # Use when enqueueing jobs
       Sidekiq.configure_client do |config|
-        config.redis = { :namespace => :mantle, :size => 1 }
+        config.redis = { :namespace => :mantle }
       end
 
+      # Used when server pulls out jobs and processes
       Sidekiq.configure_server do |config|
         config.redis = { :namespace => :mantle }
       end
+
+      Sidekiq.options = {
+        concurrency: 25,
+        require: File.expand_path('./initializer.rb'),
+        queues: ['create_import', 'create_nonimport', 'update', 'delete']
+      }
 
       Sidekiq.logger = Mantle.logger
     end

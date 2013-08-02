@@ -24,7 +24,6 @@ when "listen"
   trap("SIGINT") { exit! }
   Mantle.run!
 when "process"
-  Sidekiq.options = { concurrency: 25, require: File.expand_path(File.join(File.dirname(__FILE__), '../lib/mantle.rb')), queues: ['create_import', 'create_nonimport', 'update', 'delete'] }
   cli = Sidekiq::CLI.instance
   cli.parse
   cli.run
