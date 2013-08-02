@@ -1,5 +1,6 @@
 require 'sidekiq'
 require 'sidekiq/cli'
+
 module Sidekiq
   class CLI
     private

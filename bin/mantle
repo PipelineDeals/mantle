@@ -9,6 +9,14 @@ rescue LoadError
   raise "Implement ./initializer.rb in your application root to boot your application and load dependencies"
 end
 
+if ARGV.length < 1 then
+  puts "Usage: mantle <command>"
+  puts "  Commands: "
+  puts "    listen - subscribe to pubsub and enqueue jobs"
+  puts "    process - process jobs off the internal queue"
+  exit 0
+end
+
 Mantle.boot_system!
 
 case ARGV[0].strip
