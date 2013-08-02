@@ -3,6 +3,12 @@ require 'sidekiq'
 require 'sidekiq/cli'
 require 'mantle/sidekiq_overrides'
 
+begin
+  require "./initializer"
+rescue LoadError
+  raise "Implement ./initializer.rb in your application root to boot your application and load dependencies"
+end
+
 namespace :mantle do
   desc "Runs the listener to listen for changes to things in PipelineDeals"
   task :listen do
