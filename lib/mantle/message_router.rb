@@ -12,7 +12,8 @@ module Mantle
       action = @channel.split(':')[0]
       klass = get_worker_from_action(action)
 
-      Mantle.logger.debug("Routing message from #{@channel} to #{klass}: #{@message}")
+      Mantle.logger.info("Routing message ID: #{@message['data']['id']} from #{@channel} to #{klass}")
+      Mantle.logger.debug(@message)
       klass.perform_async(@channel, JSON.parse(@message))
     end
 
