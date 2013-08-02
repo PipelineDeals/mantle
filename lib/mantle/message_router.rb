@@ -12,9 +12,9 @@ module Mantle
       action = @channel.split(':')[0]
       klass = get_worker_from_action(action)
 
-      Mantle.logger.info("Routing message ID: #{@message['data']['id']} from #{@channel} to #{klass}")
-      Mantle.logger.debug(@message)
-      klass.perform_async(@channel, JSON.parse(@message))
+      Mantle.logger.info("Routing message ID: #{parse(@message)['id']} from #{@channel} to #{klass}")
+      Mantle.logger.debug(parse(@message))
+      klass.perform_async(@channel, parse(@message))
     end
 
     private
@@ -22,7 +22,7 @@ module Mantle
     def get_worker_from_action(action)
       case action
       when 'create'
-        object = JSON.parse(@message)['data']
+        object = parse(@message)['data']
         if object['import_id']
           CreateImportWorker
         else
@@ -37,5 +37,8 @@ module Mantle
       end
     end
 
+    def parse(json)
+      JSON.parse(json)
+    end
   end
 end
