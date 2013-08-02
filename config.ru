@@ -1,8 +1,7 @@
+require 'mantle'
 require 'sidekiq'
 
-Sidekiq.configure_client do |config|
-  config.redis = { :size => 1 }
-end
+Mantle.boot_system
 
 require 'sidekiq/web'
 run Sidekiq::Web
