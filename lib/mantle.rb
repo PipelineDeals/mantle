@@ -11,6 +11,7 @@ end
 require_relative 'mantle/catch_up_handler'
 require_relative 'mantle/load_workers'
 require_relative 'mantle/local_redis'
+require_relative 'mantle/logging'
 require_relative 'mantle/message_bus'
 require_relative 'mantle/message_router'
 
@@ -18,7 +19,7 @@ module Mantle
   MissingMessageHandler = Class.new(StandardError)
 
   class << self
-    attr_accessor :message_bus_channels, :message_bus_redis, :message_bus_catch_up_key_name
+    attr_accessor :message_bus_channels, :message_bus_redis, :message_bus_catch_up_key_name, :message_handler
 
     # SubscribedModels = %w{person contact lead company deal note comment}
     # SubscribedActions = %w{create update delete}
@@ -26,6 +27,7 @@ module Mantle
     #   config.message_bus_channels = ['update:deal', 'create:person']
     #   config.message_bus_redis = Redis::Namespace.new(:jupiter, :redis => Redis.new)
     #   config.message_bus_catch_up_key_name = "action_list"
+    #   config.message_handler = MyAwesomeApp::MessageHandler
     # end
     #
     def configure
@@ -34,19 +36,12 @@ module Mantle
     end
 
     def run!
-      MessageBus.new.monitor!
-    end
-
-    def message_handler=(handler)
-      @message_handler = handler
-    end
-
-    def message_handler
-      @message_handler || begin; raise MissingMessageHandler, "Implement self.receive(action, model, object) and assign class to Mantle.message_handler"; end
+      MessageBus.new.listen!
     end
 
     def receive_message(action, model, message)
-      $stdout << "RECEIVE MESSAGE!\n"
+      raise MissingMessageHandler, "Implement self.receive(action, model, object) and assign class to Mantle.message_handler" unless message_handler
+      Mantle.logger.debug("Handler received #{action} for #{model} with #{message}")
       message_handler.receive(action, model, message)
     end
 
@@ -57,18 +52,24 @@ module Mantle
     def logger=(log)
       Mantle::Logging.logger = log
     end
-  end
 
-  private
-
-  def self.setup_sidekiq
-    Sidekiq.configure_client do |config|
-      config.redis = { :namespace => 'mantle', :size => 1}
+    def boot_system
+      configure_sidekiq
     end
-    Sidekiq.configure_server do |config|
-      config.redis = { :namespace => 'mantle' }
+
+    private
+
+    def configure_sidekiq
+      Sidekiq.configure_client do |config|
+        config.redis = { :namespace => :mantle, :size => 1 }
+      end
+
+      Sidekiq.configure_server do |config|
+        config.redis = { :namespace => :mantle }
+      end
+
+      Sidekiq.logger = Mantle.logger
     end
   end
-
 end
 

@@ -11,7 +11,7 @@ module Mantle
       raise MissingChannelList unless @channels
     end
 
-    def monitor!
+    def listen!
       catch_up
       subscribe_to_channels
     end
@@ -21,9 +21,10 @@ module Mantle
     end
 
     def subscribe_to_channels
+      Mantle.logger.debug("Initializing message bus monitoring for #{@channels} ")
+
       @redis.subscribe(@channels) do |on|
         on.message do |channel, message|
-          $stdout << "Received message on #{channel} #{message.inspect}\n"
           _, action, model = channel.split(":")
           MessageRouter.new("#{action}:#{model}", message).route!
         end

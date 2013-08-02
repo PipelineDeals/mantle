@@ -1,6 +1,6 @@
 module Mantle
   class CatchUpHandler
-    attr_accessor :message_bus_redis
+    attr_reader :message_bus_redis, :message_bus_catch_up_key_name
 
     def initialize(message_bus_redis = Mantle.message_bus_redis, message_bus_catch_up_key_name = Mantle.message_bus_catch_up_key_name)
       @message_bus_redis = message_bus_redis
@@ -8,9 +8,11 @@ module Mantle
     end
 
     def catch_up!
-      $stdout << "Catching up...\n"
+      Mantle.logger.info("Initialized catch up on list key: #{message_bus_catch_up_key_name}")
+
       return if last_success_time.nil?
-      $stdout << "Catching up from #{last_success_time}\n"
+
+      Mantle.logger.info("Catching up from time: #{last_success_time}")
       keys = get_keys_to_catch_up_on
       handle_messages_since_last_success(sort_keys(keys))
     end

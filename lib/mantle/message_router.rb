@@ -11,6 +11,8 @@ module Mantle
       return unless @message
       action = @channel.split(':')[0]
       klass = get_worker_from_action(action)
+
+      Mantle.logger.debug("Routing message from #{@channel} to #{klass}: #{@message}")
       klass.perform_async(@channel, JSON.parse(@message))
     end
 
