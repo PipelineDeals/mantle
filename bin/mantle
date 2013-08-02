@@ -21,6 +21,7 @@ Mantle.boot_system!
 
 case ARGV.first.chomp
 when "listen"
+  trap("SIGINT") { exit! }
   Mantle.run!
 when "process"
   Sidekiq.options = { concurrency: 25, require: 'mantle/load_workers', queues: ['update'] }
