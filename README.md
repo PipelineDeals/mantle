@@ -26,4 +26,16 @@ Mantle.configure do |config|
 end
 ```
 
+The `message_handler` class must implement a class method `receive` that looks like this:
 
+```Ruby
+module GlobalSearch
+  class MessageHandler
+    def self.receive(action, model, message)
+      puts action # => 'update'
+      puts model # => 'deal'
+      puts message # => { 'id' => 5, 'name' => 'Brandon' }
+    end
+  end
+end
+```
