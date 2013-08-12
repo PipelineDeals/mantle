@@ -8,7 +8,7 @@ Add this line to your application's Gemfile:
 
 or install manually by:
 
-  $ gem install mantle
+    $ gem install mantle
 
 
 ## Usage
