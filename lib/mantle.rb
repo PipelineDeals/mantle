@@ -81,4 +81,3 @@ module Mantle
     end
   end
 end
-
