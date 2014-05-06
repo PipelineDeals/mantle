@@ -21,7 +21,7 @@ Gem::Specification.new do |gem|
   gem.add_dependency('redis-namespace')
   gem.add_dependency('slim')
   gem.add_dependency('sinatra')
-  gem.add_dependency('sidekiq')
+  gem.add_dependency('sidekiq', '~> 2.0')
   gem.add_dependency('json')
 
   gem.add_development_dependency('rspec')
