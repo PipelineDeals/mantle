@@ -1,4 +1,4 @@
-require 'mantle'
+require_relative './lib/mantle'
 require 'sidekiq'
 
 Mantle.boot_system!
