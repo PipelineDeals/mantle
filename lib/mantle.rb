@@ -71,11 +71,11 @@ module Mantle
         config.redis = { :namespace => :mantle }
       end
 
-      Sidekiq.options = {
+      Sidekiq.options = Sidekiq::DEFAULTS.merge({
         concurrency: 25,
         require: File.expand_path('./initializer.rb'),
         queues: ['create_import', 'create_nonimport', 'update', 'delete']
-      }
+      })
 
       Sidekiq.logger = Mantle.logger
     end
