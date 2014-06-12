@@ -4,9 +4,11 @@ require_relative '../lib/mantle'
 require 'sidekiq/cli'
 
 begin
-  require "./initializer"
+  require './initializer'
 rescue LoadError
-  raise "Implement ./initializer.rb in your application root to boot your application and load dependencies"
+  require './config/initializers/mantle'
+rescue LoadError
+  raise 'Implement ./initializer.rb in your application root to boot your application and load dependencies'
 end
 
 if ARGV.length < 1 then
