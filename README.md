@@ -24,7 +24,6 @@ require 'rubygems'
 require 'bundler/setup'
 
 load Gem.bin_path('mantle', 'mantle')
-
 ```
 
 define class with `receive` method. For example `app/models/some_message_handler.rb`
@@ -37,7 +36,6 @@ class SomeMessageHandler
     puts message # => { 'id' => 5, 'name' => 'Brandon' }
   end
 end
-
 ```
 
 then paste this code to `config/environment.rb`
@@ -54,7 +52,6 @@ Mantle.configure do |config|
   config.message_bus_catch_up_key_name = 'action_list'
   config.message_handler = SomeMessageHandler
 end
-
 ```
 
 Note that `SomeMessageHandler` might be substituted for any class you want as long as it has `receive` method defined but you need to `require` it instead of `'some_message_handler'`
@@ -64,8 +61,9 @@ To run enter this commands:
 ```Ruby
 bin/mantle listen
 bin/mantle process
-
 ```
+
+and remember to start application server!
 
 ## Usage (in Sinatra App)
 
