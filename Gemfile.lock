@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    mantle (0.1.0)
+    mantle (0.2.0)
       json
       redis
       redis-namespace
