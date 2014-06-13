@@ -13,9 +13,11 @@ or install manually by:
 
 ## Usage (in Rails App)
 
-add following code to `bin/mantle` file:
+add following code to `bin/mantle` file and make it `chmod 755 bin/mantle`:
 
 ```Ruby
+#!/usr/bin/env ruby
+
 require 'pathname'
 ENV['BUNDLE_GEMFILE'] ||= File.expand_path("../../Gemfile",
   Pathname.new(__FILE__).realpath)
