@@ -3,7 +3,7 @@ describe Mantle::CatchUpHandler do
   let(:handler) { Mantle::CatchUpHandler.new(double) }
 
   before :each do
-    Mantle.stub(:message_bus_catch_up_key_name).and_return("action_list")
+    allow(Mantle).to receive(:message_bus_catch_up_key_name) { "action_list" }
   end
 
   describe "#compare_times" do
@@ -11,7 +11,7 @@ describe Mantle::CatchUpHandler do
       let(:t1) { 10_000 }
       let(:t2) { 10_000 }
       it "is false" do
-        handler.compare_times(t1, t2).should be_false
+        expect(handler.compare_times(t1, t2)).to be_falsey
       end
     end
 
@@ -19,14 +19,14 @@ describe Mantle::CatchUpHandler do
       let(:t1) { 10_000 }
       let(:t2) { 10_005 }
       it "is four" do
-        handler.compare_times(t1, t2).should eql(4)
+        expect(handler.compare_times(t1, t2)).to eq 4
       end
     end
     context "when the fourth digit is different" do
       let(:t1) { 10_000 }
       let(:t2) { 10_050 }
       it "is three" do
-        handler.compare_times(t1, t2).should eql(3)
+        expect(handler.compare_times(t1, t2)).to eq 3
       end
     end
 
@@ -34,7 +34,7 @@ describe Mantle::CatchUpHandler do
       let(:t1) { 10_000 }
       let(:t2) { 20_050 }
       it "is three" do
-        handler.compare_times(t1, t2).should eql(0)
+        expect(handler.compare_times(t1, t2)).to eq 0
       end
     end
   end
@@ -44,7 +44,7 @@ describe Mantle::CatchUpHandler do
     let(:sorted_keys) { ["jupiter:action_list:1370533458.10278:contact:update:107", "jupiter:action_list:1370533526.42493:contact:update:108", "jupiter:action_list:1370533530.12034:contact:update:106", "jupiter:action_list:1370533534.67259:contact:update:103"] }
 
     it "sorts the keys" do
-      handler.sort_keys(keys).should eql(sorted_keys)
+      expect(handler.sort_keys(keys)).to eq sorted_keys
     end
   end
 
@@ -53,10 +53,11 @@ describe Mantle::CatchUpHandler do
     let(:keys_not_seen) { ["jupiter:action_list:1370533530.12034:contact:update:106", "jupiter:action_list:1370533534.67259:contact:update:103"] }
 
     it "finds the right keys" do
-      handler.stub(:last_success_time).and_return(Time.at(1370533_529))
-      Time.stub(:now).and_return(Time.at(1370533_560))
-      handler.message_bus_redis.stub(:keys).with("#{Mantle.message_bus_catch_up_key_name}:13705335*").and_return(keys_not_seen)
-      handler.get_keys_to_catch_up_on.should eql(keys_not_seen)
+      allow(handler).to receive(:last_success_time) { Time.at(1370533_529) }
+      allow(Time).to receive(:now) { Time.at(1370533_560) }
+      allow(handler.message_bus_redis).
+          to receive(:keys).with("#{Mantle.message_bus_catch_up_key_name}:13705335*") { keys_not_seen }
+      expect(handler.get_keys_to_catch_up_on).to eq keys_not_seen
     end
   end
 end
