@@ -7,14 +7,14 @@ describe Mantle::MessageRouter do
       let(:message) { {'data' => {'import_id' => 1234}} }
 
       it "creates a CreateImportWorker and call perform_async on it" do
-        Mantle::CreateImportWorker.should_receive(:perform_async).with(channel_key("create"), message)
+        allow(Mantle::CreateImportWorker).to receive(:perform_sync).with(channel_key("create"), message)
         Mantle::MessageRouter.new(channel_key("create"), message.to_json).route!
       end
     end
 
     context "when the data does not have an import id" do
       it "creates a CreateNonimportWorker and call perform_async on it" do
-        Mantle::CreateNonimportWorker.should_receive(:perform_async).with(channel_key("create"), message)
+        allow(Mantle::CreateNonimportWorker).to receive(:perform_sync).with(channel_key("create"), message)
         Mantle::MessageRouter.new(channel_key("create"), message.to_json).route!
       end
     end
@@ -22,14 +22,14 @@ describe Mantle::MessageRouter do
 
   describe "routing update messages" do
     it "creates a UpdateWorker and call perform_async on it" do
-      Mantle::UpdateWorker.should_receive(:perform_async).with(channel_key("update"), message)
+      allow(Mantle::UpdateWorker).to receive(:perform_sync).with(channel_key("update"), message)
       Mantle::MessageRouter.new(channel_key("update"), message.to_json).route!
     end
   end
 
   describe "routing delete messages" do
     it "creates a UpdateWorker and call perform_async on it" do
-      Mantle::DeleteWorker.should_receive(:perform_async).with(channel_key("destroy"), message)
+      allow(Mantle::DeleteWorker).to receive(:perform_sync).with(channel_key("destroy"), message)
       Mantle::MessageRouter.new(channel_key("destroy"), message.to_json).route!
     end
   end
