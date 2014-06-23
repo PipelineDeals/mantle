@@ -4,26 +4,28 @@ require_relative '../lib/mantle'
 require 'sidekiq/cli'
 
 begin
-  require "./initializer"
+  require './initializer'
 rescue LoadError
-  raise "Implement ./initializer.rb in your application root to boot your application and load dependencies"
+  require './config/environment.rb'
+rescue LoadError
+  raise 'Implement ./initializer.rb or add mantle config to ./config/environment.rb in your application root to boot your application and load dependencies'
 end
 
 if ARGV.length < 1 then
-  puts "Usage: mantle <command>"
-  puts "  Commands: "
-  puts "    listen - subscribe to pubsub and enqueue jobs"
-  puts "    process - process jobs off the internal queue"
+  puts 'Usage: mantle <command>'
+  puts '  Commands: '
+  puts '    listen - subscribe to pubsub and enqueue jobs'
+  puts '    process - process jobs off the internal queue'
   exit(0)
 end
 
 Mantle.boot_system!
 
 case ARGV.first.chomp
-when "listen"
-  trap("SIGINT") { exit! }
+when 'listen'
+  trap('SIGINT') { exit! }
   Mantle.run!
-when "process"
+when 'process'
   cli = Sidekiq::CLI.instance
   cli.parse
   cli.run

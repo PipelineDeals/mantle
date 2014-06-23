@@ -73,7 +73,7 @@ module Mantle
 
       Sidekiq.options = Sidekiq::DEFAULTS.merge({
         concurrency: 25,
-        require: File.expand_path('./initializer.rb'),
+        require: File.exist?('./initializer.rb') ? File.expand_path('./initializer.rb') : '.',
         queues: ['create_import', 'create_nonimport', 'update', 'delete']
       })
 
