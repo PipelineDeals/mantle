@@ -26,7 +26,7 @@ module Mantle
 
       @redis.subscribe(@channels) do |on|
         on.message do |channel, message|
-          _, action, model = channel.split(":")
+          action, model = channel.split(":")
           MessageRouter.new("#{action}:#{model}", message).route!
         end
       end
