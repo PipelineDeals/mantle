@@ -42,7 +42,7 @@ module Mantle
     def receive_message(action, model, message)
       raise MissingMessageHandler, "Implement self.receive(action, model, object) and assign class to Mantle.message_handler" unless message_handler
       Mantle.logger.debug("Handler received #{action} for #{model} ID: #{message['id']}")
-      Mantle.logger.debug("Message: #{parse(message)}")
+      Mantle.logger.debug("Message: #{message}")
       message_handler.receive(action, model, message)
     end
 
