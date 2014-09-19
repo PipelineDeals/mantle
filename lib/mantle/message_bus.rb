@@ -12,7 +12,7 @@ module Mantle
     end
 
     def listen!
-      Mantle.logger.debug("Connecting to message bus redis: #{@redis.inspect} ")
+      Mantle.logger.info("Connecting to message bus redis: #{@redis.inspect} ")
       catch_up
       subscribe_to_channels
     end
