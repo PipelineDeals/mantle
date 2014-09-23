@@ -1,6 +1,7 @@
 require 'rubygems'
 require 'redis'
 require 'sidekiq'
+require 'sidekiq/middleware/server/logging'
 require 'json'
 
 begin
