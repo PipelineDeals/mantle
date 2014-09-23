@@ -70,7 +70,10 @@ module Mantle
       # Used when server pulls out jobs and processes
       Sidekiq.configure_server do |config|
         config.redis = { :namespace => :mantle }
-        config.remove Sidekiq::Middleware::Server::Logging
+
+        config.server_middleware do |chain|
+          chain.remove Sidekiq::Middleware::Server::Logging
+        end
       end
 
       Sidekiq.options = Sidekiq::DEFAULTS.merge({
