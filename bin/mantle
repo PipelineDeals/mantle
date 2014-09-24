@@ -1,7 +1,9 @@
 #!/usr/bin/env ruby
 
 require_relative '../lib/mantle'
+require 'celluloid'
 require 'sidekiq/cli'
+require 'sidekiq/processor'
 
 begin
   require './initializer'
