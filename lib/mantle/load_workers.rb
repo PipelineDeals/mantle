@@ -1,5 +1,0 @@
-require_relative 'workers/worker.rb'
-require_relative 'workers/create_import_worker.rb'
-require_relative 'workers/create_nonimport_worker.rb'
-require_relative 'workers/delete_worker.rb'
-require_relative 'workers/update_worker.rb'

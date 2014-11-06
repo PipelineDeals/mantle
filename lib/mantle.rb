@@ -9,7 +9,7 @@ rescue LoadError
 end
 
 require_relative 'mantle/catch_up_handler'
-require_relative 'mantle/load_workers'
+require_relative 'mantle/workers/mantle_worker'
 require_relative 'mantle/local_redis'
 require_relative 'mantle/logging'
 require_relative 'mantle/message_bus'
@@ -78,7 +78,7 @@ module Mantle
       Sidekiq.options = Sidekiq::DEFAULTS.merge({
         concurrency: 25,
         require: File.exist?('./initializer.rb') ? File.expand_path('./initializer.rb') : '.',
-        queues: ['create_import', 'create_nonimport', 'update', 'delete']
+        queues: ['mantle']
       })
 
       Sidekiq.logger = Mantle.logger

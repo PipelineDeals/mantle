@@ -1,5 +1,5 @@
 module Mantle
-  class Worker
+  class MantleWorker
     include Sidekiq::Worker
 
     def perform(channel, message)
