@@ -10,7 +10,7 @@ describe Mantle::MessageBus do
   let(:listener) { Mantle::MessageBus.new(double("redis"), channels)  }
 
   describe "catchup" do
-    it "should delegate to the catch up handler" do
+    it "delegates to the catch up handler" do
       expect_any_instance_of(Mantle::CatchUpHandler).to receive(:catch_up!)
       listener.catch_up
     end

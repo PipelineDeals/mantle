@@ -1,6 +1,8 @@
 module Mantle
-  class Worker
+  class MantleWorker
     include Sidekiq::Worker
+
+    sidekiq_options queue: :mantle
 
     def perform(channel, message)
       action = channel.split(':')[0]

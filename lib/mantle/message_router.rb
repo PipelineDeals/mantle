@@ -1,41 +1,23 @@
 module Mantle
   class MessageRouter
-    UnknownAction = Class.new(StandardError)
-
     def initialize(channel, message)
-      @channel = channel
-      @message = message
+      @channel, @message = channel, message
     end
 
     def route!
       return unless @message
-      action = @channel.split(':')[0]
-      klass = get_worker_from_action(action)
 
-      Mantle.logger.debug("Routing message ID: #{parse(@message)['id']} from #{@channel} to #{klass}")
-      Mantle.logger.debug("Message: #{parse(@message)}")
-      klass.perform_async(@channel, parse(@message))
+      parsed_json = parse(message)
+
+      Mantle.logger.debug("Routing message ID: #{parsed_json['id']} from #{channel}")
+      Mantle.logger.debug("Message: #{parsed_json}")
+
+      MantleWorker.perform_async(channel, parsed_json)
     end
 
     private
 
-    def get_worker_from_action(action)
-      case action
-      when 'create'
-        object = parse(@message)['data']
-        if object['import_id']
-          CreateImportWorker
-        else
-          CreateNonimportWorker
-        end
-      when 'update'
-        UpdateWorker
-      when 'destroy'
-        DeleteWorker
-      else
-        raise UnknownAction
-      end
-    end
+    attr_reader :channel, :message
 
     def parse(json)
       JSON.parse(json)
