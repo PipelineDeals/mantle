@@ -75,11 +75,11 @@ module Mantle
         end
       end
 
-      Sidekiq.options = Sidekiq::DEFAULTS.merge({
-        # concurrency: 25,
-        require: File.exist?('./initializer.rb') ? File.expand_path('./initializer.rb') : '.',
-        # queues: ['mantle']
-      })
+      # Sidekiq.options = Sidekiq::DEFAULTS.merge({
+      #   # concurrency: 25,
+      #   # require: File.exist?('./initializer.rb') ? File.expand_path('./initializer.rb') : '.',
+      #   # queues: ['mantle']
+      # })
 
       Sidekiq.logger = Mantle.logger
     end
