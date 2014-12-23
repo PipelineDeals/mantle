@@ -62,13 +62,13 @@ module Mantle
 
     def configure_sidekiq
       # Use when enqueueing jobs
-      Sidekiq.configure_client do |config|
-        config.redis = { :namespace => :mantle }
-      end
+      # Sidekiq.configure_client do |config|
+      #   config.redis = { :namespace => :mantle }
+      # end
 
       # Used when server pulls out jobs and processes
       Sidekiq.configure_server do |config|
-        config.redis = { :namespace => :mantle }
+        # config.redis = { :namespace => :mantle }
 
         config.server_middleware do |chain|
           chain.remove Sidekiq::Middleware::Server::Logging
