@@ -27,8 +27,4 @@ case ARGV.first.chomp
 when 'listen'
   trap('SIGINT') { exit! }
   Mantle.run!
-when 'process'
-  cli = Sidekiq::CLI.instance
-  cli.parse
-  cli.run
 end
