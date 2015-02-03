@@ -7,7 +7,7 @@ module Mantle
       @message_bus_catch_up_key_name = Mantle.configuration.message_bus_catch_up_key_name
     end
 
-    def catch_up!
+    def catch_up
       raise Mantle::Error::MissingRedisConnection unless message_bus_redis
 
       Mantle.logger.info("Initialized catch up on list key: #{message_bus_catch_up_key_name}")

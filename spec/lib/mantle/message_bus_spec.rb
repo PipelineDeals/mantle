@@ -12,7 +12,7 @@ describe Mantle::MessageBus do
 
   describe "#catchup" do
     it "delegates to the catch up handler" do
-      expect_any_instance_of(Mantle::CatchUpHandler).to receive(:catch_up!)
+      expect_any_instance_of(Mantle::CatchUpHandler).to receive(:catch_up)
       Mantle::MessageBus.new.catch_up
     end
   end

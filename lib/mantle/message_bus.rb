@@ -16,7 +16,7 @@ module Mantle
     end
 
     def catch_up
-      CatchUpHandler.new.catch_up!
+      CatchUpHandler.new.catch_up
     end
 
     def subscribe_to_channels
