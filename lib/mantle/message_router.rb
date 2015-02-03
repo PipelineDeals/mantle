@@ -4,8 +4,8 @@ module Mantle
       @channel, @message = channel, message
     end
 
-    def route!
-      return unless @message
+    def route
+      return unless message
 
       parsed_json = parse(message)
 
