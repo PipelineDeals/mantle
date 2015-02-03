@@ -36,7 +36,7 @@ module Mantle
     end
 
     def catch_up_key_names(prefix)
-      "#{@message_bus_catch_up_key_name}:#{prefix}*"
+      "#{message_bus_catch_up_key_name}:#{prefix}*"
     end
 
     def last_success_time

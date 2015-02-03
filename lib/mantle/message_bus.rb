@@ -3,11 +3,11 @@ module Mantle
     MissingChannelList = Class.new(StandardError)
     MissingRedisConnection = Class.new(StandardError)
 
-    def initialize(redis = Mantle.message_bus_redis, channels = Mantle.message_bus_channels)
-      @redis = redis
+    def initialize
+      @redis = Mantle.message_bus_redis
       raise MissingRedisConnection unless @redis
 
-      @channels = channels
+      @channels = Mantle.message_bus_channels
       raise MissingChannelList unless @channels
     end
 
