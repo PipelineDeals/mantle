@@ -17,14 +17,13 @@ if ARGV.length < 1 then
   puts 'Usage: mantle <command>'
   puts '  Commands: '
   puts '    listen - subscribe to pubsub and enqueue jobs'
-  puts '    process - process jobs off the internal queue'
   exit(0)
 end
 
-Mantle.boot_system!
+Mantle.configure_system
 
 case ARGV.first.chomp
 when 'listen'
   trap('SIGINT') { exit! }
-  Mantle.run!
+  Mantle::MessageBus.new.listen
 end

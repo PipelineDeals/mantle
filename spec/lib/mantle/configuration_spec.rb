@@ -26,6 +26,8 @@ describe Mantle::Configuration do
   end
 
   it 'can set/get message_handler' do
+    FakeHandler = Class.new
+
     config = Mantle::Configuration.new
     config.message_handler = FakeHandler
     expect(config.message_handler).to eq(FakeHandler)
@@ -36,7 +38,17 @@ describe Mantle::Configuration do
     expect(config.message_handler).to eq(Mantle::MessageHandler)
   end
 
-  FakeHandler = Class.new
+  it 'can set/get logger' do
+    logger = Logger.new(STDOUT)
+    config = Mantle::Configuration.new
+    config.logger = logger
+    expect(config.logger).to eq(logger)
+  end
+
+  it 'configures default logger' do
+    config = Mantle::Configuration.new
+    expect(config.logger.level).to eq(0)
+  end
 end
 
 

@@ -13,25 +13,11 @@ or install manually by:
 
 ## Usage (in Rails App)
 
-add following code to `bin/mantle` file and make it `chmod 755 bin/mantle`:
+
+Define message handler class with `.receive` method. For example `app/models/my_message_handler.rb`
 
 ```Ruby
-#!/usr/bin/env ruby
-
-require 'pathname'
-ENV['BUNDLE_GEMFILE'] ||= File.expand_path("../../Gemfile",
-  Pathname.new(__FILE__).realpath)
-
-require 'rubygems'
-require 'bundler/setup'
-
-load Gem.bin_path('mantle', 'mantle')
-```
-
-define class with `receive` method. For example `app/models/some_message_handler.rb`
-
-```Ruby
-class SomeMessageHandler
+class MyMessageHandler
   def self.receive(action, model, message)
     puts action # => 'update'
     puts model # => 'deal'
@@ -45,18 +31,16 @@ then paste this code to `config/environment.rb`
 
 ```Ruby
 require 'redis'
-require 'redis-namespace'
-require 'some_message_handler'
+require 'my_message_handler'
 
 Mantle.configure do |config|
-  config.message_bus_channels = ['update:user', 'create:user']
-  config.message_bus_redis = Redis::Namespace.new(:jupiter, redis: Redis.new)
-  config.message_bus_catch_up_key_name = 'action_list'
-  config.message_handler = SomeMessageHandler
+  config.message_bus_channels = ['update:deal', 'create:person'] (default: [])
+  config.message_bus_redis = Redis.new(host: 'localhost') (default: localhost)
+  config.message_bus_catch_up_key_name = "list" (default: "action_list")
+  config.message_handler = MyMessageHandler (needs config)
+  config.logger = Rails.logger (default: Logger.new(STDOUT))
 end
 ```
-
-Note that `SomeMessageHandler` might be substituted for any class you want as long as it has `receive` method defined but you need to `require` it instead of `'some_message_handler'`
 
 To run enter this commands:
 
@@ -76,33 +60,4 @@ bin/sidekiq -q mantle -q default
 
 It will NOT add the `default` queue to processing if there are other queues
 enumerated using the `-q` option.
-
-## Usage (in Sinatra App)
-
-Create a file named `initializer.rb` in the root of the application specify setup:
-
-```Ruby
-require_relative 'lib/my_awesome_app'
-
-Mantle.configure do |config|
-  config.message_bus_channels = ['update:deal', 'create:deal']
-  config.message_bus_redis = Redis::Namespace.new(:jupiter, :redis => Redis.new)
-  config.message_bus_catch_up_key_name = "action_list"
-  config.message_handler = MyAwesomeApp::MessageHandler
-end
-```
-
-The `message_handler` class must implement a class method `receive` that looks like this:
-
-```Ruby
-module GlobalSearch
-  class MessageHandler
-    def self.receive(action, model, message)
-      puts action # => 'update'
-      puts model # => 'deal'
-      puts message # => { 'id' => 5, 'name' => 'Brandon' }
-    end
-  end
-end
-```
 

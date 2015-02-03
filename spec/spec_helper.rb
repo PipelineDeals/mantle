@@ -2,7 +2,9 @@ require 'mantle'
 require 'pry'
 require 'sidekiq/testing'
 
-Mantle.logger = Logger.new("/dev/null")
+Mantle.configure do |config|
+  config.logger = Logger.new("/dev/null")
+end
 
 RSpec.configure do |config|
   config.before(:each) do

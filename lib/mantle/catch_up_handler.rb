@@ -3,8 +3,8 @@ module Mantle
     attr_reader :message_bus_redis, :message_bus_catch_up_key_name
 
     def initialize
-      @message_bus_redis = Mantle.message_bus_redis
-      @message_bus_catch_up_key_name = Mantle.message_bus_catch_up_key_name
+      @message_bus_redis = Mantle.configuration.message_bus_redis
+      @message_bus_catch_up_key_name = Mantle.configuration.message_bus_catch_up_key_name
     end
 
     def catch_up!

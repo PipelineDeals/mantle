@@ -4,8 +4,8 @@ module Mantle
     attr_writer :redis
 
     def initialize
-      @redis = Mantle.message_bus_redis
-      @channels = Mantle.message_bus_channels
+      @redis = Mantle.configuration.message_bus_redis
+      @channels = Mantle.configuration.message_bus_channels
     end
 
     def listen
@@ -21,7 +21,6 @@ module Mantle
 
     def subscribe_to_channels
       raise Mantle::Error::MissingRedisConnection unless redis
-      raise Mantle::Error::MissingChannelList unless channels
 
       Mantle.logger.info("Subscribing to message bus for #{channels} ")
 

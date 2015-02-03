@@ -24,14 +24,5 @@ describe Mantle::MessageBus do
         mb.subscribe_to_channels
       }.to raise_error(Mantle::Error::MissingRedisConnection)
     end
-
-    it "raises without channel list" do
-      mb = Mantle::MessageBus.new
-      mb.redis = OpenStruct.new
-
-      expect {
-        mb.subscribe_to_channels
-      }.to raise_error(Mantle::Error::MissingChannelList)
-    end
   end
 end
