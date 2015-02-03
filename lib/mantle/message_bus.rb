@@ -28,7 +28,7 @@ module Mantle
       redis.subscribe(channels) do |on|
         on.message do |channel, message|
           action, model = channel.split(":")
-          MessageRouter.new("#{action}:#{model}", message).route!
+          MessageRouter.new("#{action}:#{model}", message).route
         end
       end
     end
