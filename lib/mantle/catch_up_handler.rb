@@ -1,10 +1,11 @@
 module Mantle
   class CatchUpHandler
-    attr_reader :message_bus_redis, :message_bus_catch_up_key_name
+    attr_reader :message_bus_redis, :message_bus_catch_up_key_name, :message_bus_channels
 
-    def initialize(message_bus_redis = Mantle.message_bus_redis, message_bus_catch_up_key_name = Mantle.message_bus_catch_up_key_name)
+    def initialize(message_bus_redis = Mantle.message_bus_redis, message_bus_catch_up_key_name = Mantle.message_bus_catch_up_key_name, message_bus_channels = Mantle.message_bus_channels)
       @message_bus_redis = message_bus_redis
       @message_bus_catch_up_key_name = message_bus_catch_up_key_name
+      @message_bus_channels = message_bus_channels
     end
 
     def catch_up!
@@ -48,8 +49,10 @@ module Mantle
         _, timestamp, model, action, id = key.split(':')
         if timestamp.to_f > last_success_time.to_f
           channel = "#{action}:#{model}"
-          message = message_bus_redis.get(key)
-          MessageRouter.new(channel, message).route!
+          if message_bus_channels.include?(channel)
+            message = message_bus_redis.get(key)
+            MessageRouter.new(channel, message).route!
+          end
         end
       end
     end
