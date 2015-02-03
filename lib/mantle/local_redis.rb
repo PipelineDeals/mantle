@@ -1,11 +1,9 @@
 module Mantle
   class LocalRedis
-    def self.set_message_successfully_received
-      time = Time.now.to_i
-
-      Mantle.logger.debug("Setting last successful message received time: #{time}")
-
-      Sidekiq.redis { |conn| conn.set('last_successful_message_received', time) }
+    def self.set_message_successfully_received(time = Time.now)
+      i_time = time.to_i
+      Sidekiq.redis { |conn| conn.set('last_successful_message_received', i_time) }
+      Mantle.logger.debug("Set last successful message received time: #{i_time}")
     end
 
     def self.last_message_successfully_received_at
