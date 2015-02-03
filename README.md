@@ -96,16 +96,3 @@ module GlobalSearch
 end
 ```
 
-## Monitor
-
-Mount in a rack app:
-
-```ruby
-# config.ru
-
-require './lib/pipeline_dogfood'
-require 'mantle/monitor'
-
-run Rack::URLMap.new('/' => PipelineDogfood::App, '/sidekiq' =>
-Mantle::Monitor)
-```
