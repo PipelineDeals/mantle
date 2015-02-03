@@ -4,9 +4,7 @@ module Mantle
 
     sidekiq_options queue: :mantle
 
-    def perform(channel, message)
-      action = channel.split(':')[0]
-      model = channel.split(':')[1]
+    def perform(action, model, message)
       Mantle.receive_message(action, model, message)
       Mantle::LocalRedis.set_message_successfully_received
     end

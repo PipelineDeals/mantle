@@ -51,7 +51,7 @@ module Mantle
         if timestamp.to_f > last_success_time.to_f
           channel = "#{action}:#{model}"
           message = message_bus_redis.get(key)
-          MessageRouter.new(channel, message).route
+          Mantle::MessageRouter.new(action, model, message).route
         end
       end
     end
