@@ -60,5 +60,36 @@ describe Mantle::CatchUpHandler do
       expect(handler.get_keys_to_catch_up_on).to eq keys_not_seen
     end
   end
+
+  describe "#handle_messages_since_last_success" do
+    let(:json) { "\"message\"" }
+    let(:message_router) { double(route!: true) }
+
+    before do
+      allow(Mantle).to receive(:message_bus_channels) { ['update:contact'] }
+      allow(handler).to receive(:last_success_time) { Time.at(1) }
+      allow(Time).to receive(:now) { Time.at(2) }
+      allow(handler.message_bus_redis).to receive(:get).and_return(json)
+      allow(handler.message_bus_redis).to receive(:keys) { message }
+    end
+
+    context 'message published on channel listed in Mantle.message_bus_channels' do
+      let(:message) { ["action_list:1370533530.12034:contact:update:106"] }
+
+      it "routes the messages" do
+        expect(Mantle::MessageRouter).to receive(:new).with('update:contact', json).and_return(message_router)
+        handler.catch_up!
+      end
+    end
+
+    context 'message published on channel NOT listed in Mantle.message_bus_channels' do
+      let(:message) { ["action_list:1370533530.12034:account:update:1"] }
+
+      it "does not route the message" do
+        expect(Mantle::MessageRouter).to_not receive(:new).with('update:account', json)
+        handler.catch_up!
+      end
+    end
+  end
 end
 
