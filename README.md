@@ -53,28 +53,26 @@ end
 
 To run the listener:
 
-```Ruby
+```
 bin/mantle
 ```
 
 or with configuration:
 
-```Ruby
+```
 bin/mantle -c ./config/initializers/other_file.rb
 ```
 
 To run the processor:
 
-```ruby
+```
 bin/sidekiq -q mantle
 ```
 
 If the Sidekiq worker should also listen on another queue, add that to the
 command with:
 
-
-```Ruby
-bin/mantle listen
+```
 bin/sidekiq -q mantle -q default
 ```
 
