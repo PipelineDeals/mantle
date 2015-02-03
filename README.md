@@ -26,13 +26,22 @@ class MyMessageHandler
 end
 ```
 
-then paste this code to `config/environment.rb`
+Setup a Rails initializer(`config/initializers/mantle.rb`):
 
 
 ```Ruby
-require 'redis'
-require 'my_message_handler'
+require_relative '../../app/models/mantle_message_handler'
 
+Mantle.configure do |config|
+  config.message_bus_channels = %w[update:account]
+  config.message_bus_redis = Redis.new(host: ENV["MESSAGE_BUS_REDIS_URL"] || 'localhost')
+  config.message_handler = MantleMessageHandler
+end
+```
+
+The config takes a number of options, many of which have defaults:
+
+```
 Mantle.configure do |config|
   config.message_bus_channels = ['update:deal', 'create:person'] (default: [])
   config.message_bus_redis = Redis.new(host: 'localhost') (default: localhost)
@@ -42,10 +51,21 @@ Mantle.configure do |config|
 end
 ```
 
-To run enter this commands:
+To run the listener:
 
 ```Ruby
-bin/mantle listen
+bin/mantle
+```
+
+or with configuration:
+
+```Ruby
+bin/mantle -c ./config/initializers/other_file.rb
+```
+
+To run the processor:
+
+```ruby
 bin/sidekiq -q mantle
 ```
 
@@ -60,4 +80,3 @@ bin/sidekiq -q mantle -q default
 
 It will NOT add the `default` queue to processing if there are other queues
 enumerated using the `-q` option.
-

@@ -1,29 +1,14 @@
 #!/usr/bin/env ruby
 
-require_relative '../lib/mantle'
 require 'celluloid'
 require 'sidekiq/cli'
 require 'sidekiq/processor'
 
-begin
-  require './initializer'
-rescue LoadError
-  require './config/environment.rb'
-rescue LoadError
-  raise 'Implement ./initializer.rb or add mantle config to ./config/environment.rb in your application root to boot your application and load dependencies'
-end
+require_relative '../lib/mantle/cli'
 
-if ARGV.length < 1 then
-  puts 'Usage: mantle <command>'
-  puts '  Commands: '
-  puts '    listen - subscribe to pubsub and enqueue jobs'
-  exit(0)
-end
+cli = Mantle::CLI.new
+cli.setup
 
-Mantle.configure_system
+trap('SIGINT') { exit! }
 
-case ARGV.first.chomp
-when 'listen'
-  trap('SIGINT') { exit! }
-  Mantle::MessageBus.new.listen
-end
+cli.listen

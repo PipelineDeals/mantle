@@ -16,6 +16,7 @@ require_relative 'mantle/message_bus'
 require_relative 'mantle/message_handler'
 require_relative 'mantle/message_router'
 require_relative 'mantle/worker'
+require_relative 'mantle/version'
 
 module Mantle
   class << self
