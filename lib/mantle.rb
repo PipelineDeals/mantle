@@ -21,11 +21,9 @@ module Mantle
   class << self
     attr_accessor :message_bus_channels, :message_bus_redis, :message_bus_catch_up_key_name, :message_handler
 
-    # SubscribedModels = %w{person contact lead company deal note comment}
-    # SubscribedActions = %w{create update delete}
     # Mantle.configure do |config|
     #   config.message_bus_channels = ['update:deal', 'create:person']
-    #   config.message_bus_redis = Redis::Namespace.new(:jupiter, :redis => Redis.new)
+    #   config.message_bus_redis = Redis::Namespace.new(:mantle, redis: Redis.new)
     #   config.message_bus_catch_up_key_name = "action_list"
     #   config.message_handler = MyAwesomeApp::MessageHandler
     # end
@@ -41,8 +39,10 @@ module Mantle
 
     def receive_message(action, model, message)
       raise MissingMessageHandler, "Implement self.receive(action, model, object) and assign class to Mantle.message_handler" unless message_handler
+
       Mantle.logger.debug("Handler received #{action} for #{model} ID: #{message['id']}")
       Mantle.logger.debug("Message: #{message}")
+
       message_handler.receive(action, model, message)
     end
 

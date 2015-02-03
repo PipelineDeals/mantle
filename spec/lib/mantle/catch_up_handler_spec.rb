@@ -1,6 +1,7 @@
 require 'spec_helper'
+
 describe Mantle::CatchUpHandler do
-  let(:handler) { Mantle::CatchUpHandler.new(double) }
+  let(:handler) { Mantle::CatchUpHandler.new }
 
   before :each do
     allow(Mantle).to receive(:message_bus_catch_up_key_name) { "action_list" }
@@ -40,8 +41,8 @@ describe Mantle::CatchUpHandler do
   end
 
   describe "#sort_keys" do
-    let(:keys) { ["jupiter:action_list:1370533530.12034:contact:update:106", "jupiter:action_list:1370533458.10278:contact:update:107", "jupiter:action_list:1370533534.67259:contact:update:103", "jupiter:action_list:1370533526.42493:contact:update:108"] }
-    let(:sorted_keys) { ["jupiter:action_list:1370533458.10278:contact:update:107", "jupiter:action_list:1370533526.42493:contact:update:108", "jupiter:action_list:1370533530.12034:contact:update:106", "jupiter:action_list:1370533534.67259:contact:update:103"] }
+    let(:keys) { ["action_list:1370533530.12034:contact:update:106", "action_list:1370533458.10278:contact:update:107", "action_list:1370533534.67259:contact:update:103", "action_list:1370533526.42493:contact:update:108"] }
+    let(:sorted_keys) { ["action_list:1370533458.10278:contact:update:107", "action_list:1370533526.42493:contact:update:108", "action_list:1370533530.12034:contact:update:106", "action_list:1370533534.67259:contact:update:103"] }
 
     it "sorts the keys" do
       expect(handler.sort_keys(keys)).to eq sorted_keys
@@ -49,8 +50,8 @@ describe Mantle::CatchUpHandler do
   end
 
   describe "#get_keys_to_catch_up_on" do
-    let(:keys) { ["jupiter:action_list:1370533530.12034:contact:update:106", "jupiter:action_list:1370533458.10278:contact:update:107", "jupiter:action_list:1370533534.67259:contact:update:103", "jupiter:action_list:1370533526.42493:contact:update:108"] }
-    let(:keys_not_seen) { ["jupiter:action_list:1370533530.12034:contact:update:106", "jupiter:action_list:1370533534.67259:contact:update:103"] }
+    let(:keys) { ["action_list:1370533530.12034:contact:update:106", "action_list:1370533458.10278:contact:update:107", "action_list:1370533534.67259:contact:update:103", "action_list:1370533526.42493:contact:update:108"] }
+    let(:keys_not_seen) { ["action_list:1370533530.12034:contact:update:106", "action_list:1370533534.67259:contact:update:103"] }
 
     it "finds the right keys" do
       allow(handler).to receive(:last_success_time) { Time.at(1370533_529) }

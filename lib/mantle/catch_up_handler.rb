@@ -2,9 +2,9 @@ module Mantle
   class CatchUpHandler
     attr_reader :message_bus_redis, :message_bus_catch_up_key_name
 
-    def initialize(message_bus_redis = Mantle.message_bus_redis, message_bus_catch_up_key_name = Mantle.message_bus_catch_up_key_name)
-      @message_bus_redis = message_bus_redis
-      @message_bus_catch_up_key_name = message_bus_catch_up_key_name
+    def initialize
+      @message_bus_redis = Mantle.message_bus_redis
+      @message_bus_catch_up_key_name = Mantle.message_bus_catch_up_key_name
     end
 
     def catch_up!
@@ -18,7 +18,7 @@ module Mantle
     end
 
     def sort_keys(keys)
-      keys.sort {|k1, k2| k1.split(":")[2].to_f <=> k2.split(":")[2].to_f }
+      keys.sort { |k1, k2| k1.split(":")[1].to_f <=> k2.split(":")[1].to_f }
     end
 
     def get_keys_to_catch_up_on
