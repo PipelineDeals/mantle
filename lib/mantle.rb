@@ -10,11 +10,11 @@ end
 
 require_relative 'mantle/catch_up_handler'
 require_relative 'mantle/error'
-require_relative 'mantle/workers/mantle_worker'
 require_relative 'mantle/local_redis'
 require_relative 'mantle/logging'
 require_relative 'mantle/message_bus'
 require_relative 'mantle/message_router'
+require_relative 'mantle/worker'
 
 module Mantle
   MissingMessageHandler = Class.new(StandardError)

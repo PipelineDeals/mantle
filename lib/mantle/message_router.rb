@@ -12,7 +12,7 @@ module Mantle
       Mantle.logger.debug("Routing message ID: #{parsed_json['id']} from #{channel}")
       Mantle.logger.debug("Message: #{parsed_json}")
 
-      MantleWorker.perform_async(channel, parsed_json)
+      Mantle::Worker.perform_async(channel, parsed_json)
     end
 
     private

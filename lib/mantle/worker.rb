@@ -1,5 +1,5 @@
 module Mantle
-  class MantleWorker
+  class Worker
     include Sidekiq::Worker
 
     sidekiq_options queue: :mantle
@@ -8,7 +8,7 @@ module Mantle
       action = channel.split(':')[0]
       model = channel.split(':')[1]
       Mantle.receive_message(action, model, message)
-      LocalRedis.set_message_successfully_received
+      Mantle::LocalRedis.set_message_successfully_received
     end
   end
 end
