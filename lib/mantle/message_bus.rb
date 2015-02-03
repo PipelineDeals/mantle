@@ -1,18 +1,16 @@
 module Mantle
   class MessageBus
-    MissingChannelList = Class.new(StandardError)
-    MissingRedisConnection = Class.new(StandardError)
+
+    attr_writer :redis
 
     def initialize
       @redis = Mantle.message_bus_redis
-      raise MissingRedisConnection unless @redis
-
       @channels = Mantle.message_bus_channels
-      raise MissingChannelList unless @channels
     end
 
-    def listen!
-      Mantle.logger.info("Connecting to message bus redis: #{@redis.inspect} ")
+    def listen
+      Mantle.logger.info("Connecting to message bus redis: #{redis.inspect} ")
+
       catch_up
       subscribe_to_channels
     end
@@ -22,14 +20,21 @@ module Mantle
     end
 
     def subscribe_to_channels
-      Mantle.logger.info("Initializing message bus monitoring for #{@channels} ")
+      raise Mantle::Error::MissingRedisConnection unless redis
+      raise Mantle::Error::MissingChannelList unless channels
 
-      @redis.subscribe(@channels) do |on|
+      Mantle.logger.info("Subscribing to message bus for #{channels} ")
+
+      redis.subscribe(channels) do |on|
         on.message do |channel, message|
           action, model = channel.split(":")
           MessageRouter.new("#{action}:#{model}", message).route!
         end
       end
     end
+
+    private
+
+    attr_reader :redis, :channels
   end
 end

@@ -9,6 +9,7 @@ rescue LoadError
 end
 
 require_relative 'mantle/catch_up_handler'
+require_relative 'mantle/error'
 require_relative 'mantle/workers/mantle_worker'
 require_relative 'mantle/local_redis'
 require_relative 'mantle/logging'
@@ -34,7 +35,7 @@ module Mantle
     end
 
     def run!
-      MessageBus.new.listen!
+      MessageBus.new.listen
     end
 
     def receive_message(action, model, message)

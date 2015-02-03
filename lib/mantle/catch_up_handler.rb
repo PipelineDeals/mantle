@@ -8,6 +8,8 @@ module Mantle
     end
 
     def catch_up!
+      raise Mantle::Error::MissingRedisConnection unless message_bus_redis
+
       Mantle.logger.info("Initialized catch up on list key: #{message_bus_catch_up_key_name}")
 
       return if last_success_time.nil?

@@ -1,18 +1,37 @@
 require 'spec_helper'
 
 describe Mantle::MessageBus do
-  let(:channels) { ["dingle:create:person", "dingle:update:person", "dingle:delete:person", "dingle:create:contact",
-                    "dingle:update:contact", "dingle:delete:contact", "dingle:create:lead", "dingle:update:lead",
-                    "dingle:delete:lead", "dingle:create:company", "dingle:update:company", "dingle:delete:company",
-                    "dingle:create:deal", "dingle:update:deal", "dingle:delete:deal", "dingle:create:note",
-                    "dingle:update:note", "dingle:delete:note", "dingle:create:comment", "dingle:update:comment",
-                    "dingle:delete:comment"] }
-  let(:listener) { Mantle::MessageBus.new(double("redis"), channels)  }
+  describe "#listen" do
+    it "delegates to the catch up handler" do
+      mb = Mantle::MessageBus.new
+      expect(mb).to receive(:catch_up) { true }
+      expect(mb).to receive(:subscribe_to_channels) { true }
+      mb.listen
+    end
+  end
 
-  describe "catchup" do
+  describe "#catchup" do
     it "delegates to the catch up handler" do
       expect_any_instance_of(Mantle::CatchUpHandler).to receive(:catch_up!)
-      listener.catch_up
+      Mantle::MessageBus.new.catch_up
+    end
+  end
+
+  describe "#subscribe_to_channels" do
+    it "raises without redis connection" do
+      mb = Mantle::MessageBus.new
+      expect {
+        mb.subscribe_to_channels
+      }.to raise_error(Mantle::Error::MissingRedisConnection)
+    end
+
+    it "raises without channel list" do
+      mb = Mantle::MessageBus.new
+      mb.redis = OpenStruct.new
+
+      expect {
+        mb.subscribe_to_channels
+      }.to raise_error(Mantle::Error::MissingChannelList)
     end
   end
 end
