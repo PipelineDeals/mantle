@@ -13,7 +13,15 @@ module Mantle
       @message_bus_channels = []
       @message_bus_catch_up_key_name = "action_list"
       @message_handler = Mantle::MessageHandler
-      @logger = Logger.new(STDOUT)
+      @logger = default_logger
+    end
+
+    private
+
+    def default_logger
+      logger = Logger.new(STDOUT)
+      logger.level = Logger::INFO
+      logger
     end
   end
 end

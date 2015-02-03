@@ -47,7 +47,7 @@ describe Mantle::Configuration do
 
   it 'configures default logger' do
     config = Mantle::Configuration.new
-    expect(config.logger.level).to eq(0)
+    expect(config.logger.level).to eq(1)
   end
 end
 
