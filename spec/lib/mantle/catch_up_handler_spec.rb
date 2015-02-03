@@ -7,6 +7,16 @@ describe Mantle::CatchUpHandler do
     allow(Mantle).to receive(:message_bus_catch_up_key_name) { "action_list" }
   end
 
+  describe "catch_up!" do
+    it "raises when redis connection is missing" do
+      cu = Mantle::CatchUpHandler.new
+
+      expect {
+        cu.catch_up!
+      }.to raise_error(Mantle::Error::MissingRedisConnection)
+    end
+  end
+
   describe "#compare_times" do
     context "when the times are the same" do
       let(:t1) { 10_000 }
