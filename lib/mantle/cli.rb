@@ -13,7 +13,6 @@ module Mantle
     def setup(args = ARGV)
       parse_options(args)
       load_config
-      Mantle.configure_system
     end
 
     def parse_options(args)
