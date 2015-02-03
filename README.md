@@ -62,10 +62,20 @@ To run enter this commands:
 
 ```Ruby
 bin/mantle listen
-bin/mantle process
+bin/sidekiq -q mantle
 ```
 
-and remember to start application server!
+If the Sidekiq worker should also listen on another queue, add that to the
+command with:
+
+
+```Ruby
+bin/mantle listen
+bin/sidekiq -q mantle -q default
+```
+
+It will NOT add the `default` queue to processing if there are other queues
+enumerated using the `-q` option.
 
 ## Usage (in Sinatra App)
 
