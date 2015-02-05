@@ -8,7 +8,7 @@ describe Mantle::CatchUp do
       redis = double("redis")
       time = 1370533530.12034
       allow(Time).to receive_message_chain(:now, :utc, :to_f).and_return(time)
-      channel = "update:person"
+      channel = "person:update"
       message = { id: 1 }
       json_message = JSON.generate(message)
 
@@ -80,11 +80,45 @@ describe Mantle::CatchUp do
     it "finds the right keys" do
       redis = double("redis")
       handler.message_bus_redis = redis
+
       allow(handler).to receive(:last_success_time) { Time.at(1370533_529) }
       allow(Time).to receive(:now) { Time.at(1370533_560) }
       allow(handler.message_bus_redis).
         to receive(:keys).with("#{Mantle.configuration.message_bus_catch_up_key_name}:13705335*") { keys_not_seen }
       expect(handler.get_keys_to_catch_up_on).to eq keys_not_seen
+    end
+  end
+
+  describe "#handle_messages_since_last_success" do
+    let(:json) { "\"message\"" }
+    let(:message_router) { double(route: true) }
+    let(:redis) { double(get: json, keys: message) }
+
+    before do
+      handler.message_bus_redis = redis
+      handler.message_bus_channels = ["contact:update"]
+
+      allow(handler).to receive(:last_success_time) { Time.at(1) }
+      allow(Time).to receive(:now) { Time.at(2) }
+      Mantle.logger.level = Logger::WARN
+    end
+
+    context 'message published on channel listed in Mantle.message_bus_channels' do
+      let(:message) { ["action_list:1370533530.12034:contact:update:106"] }
+
+      it "routes the messages" do
+        expect(Mantle::MessageRouter).to receive(:new).with("contact", "update", json).and_return(message_router)
+        handler.catch_up
+      end
+    end
+
+    context 'message published on channel NOT listed in Mantle.message_bus_channels' do
+      let(:message) { ["action_list:1370533530.12034:account:update:1"] }
+
+      it "does not route the message" do
+        expect(Mantle::MessageRouter).to_not receive(:new).with("account", "update", json)
+        handler.catch_up
+      end
     end
   end
 end

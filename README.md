@@ -33,7 +33,7 @@ Setup a Rails initializer(`config/initializers/mantle.rb`):
 require_relative '../../app/models/mantle_message_handler'
 
 Mantle.configure do |config|
-  config.message_bus_channels = %w[update:account]
+  config.message_bus_channels = %w[account:update]
   config.message_bus_redis = Redis.new(host: ENV["MESSAGE_BUS_REDIS_URL"] || 'localhost')
   config.message_handler = MantleMessageHandler
 end
@@ -43,7 +43,7 @@ The config takes a number of options, many of which have defaults:
 
 ```
 Mantle.configure do |config|
-  config.message_bus_channels = ['update:deal', 'create:person'] (default: [])
+  config.message_bus_channels = ['deal:update', 'create:person'] (default: [])
   config.message_bus_redis = Redis.new(host: 'localhost') (default: localhost)
   config.message_bus_catch_up_key_name = "list" (default: "action_list")
   config.message_handler = MyMessageHandler (needs config)

@@ -1,11 +1,12 @@
 module Mantle
   class CatchUp
-    attr_accessor :message_bus_redis
+    attr_accessor :message_bus_redis, :message_bus_channels
     attr_reader :message_bus_catch_up_key_name
 
     def initialize
       @message_bus_redis = Mantle.configuration.message_bus_redis
       @message_bus_catch_up_key_name = Mantle.configuration.message_bus_catch_up_key_name
+      @message_bus_channels = Mantle.configuration.message_bus_channels
     end
 
     def add_message(channel, message)
@@ -65,8 +66,12 @@ module Mantle
       keys.each do |key|
         _, timestamp, model, action, id = key.split(':')
         if timestamp.to_f > last_success_time.to_f
+          channel = "#{model}:#{action}"
           message = message_bus_redis.get(key)
-          Mantle::MessageRouter.new(action, model, message).route
+
+          if message_bus_channels.include?(channel)
+            Mantle::MessageRouter.new(model, action, message).route
+          end
         end
       end
     end

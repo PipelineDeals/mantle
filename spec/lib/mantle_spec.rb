@@ -23,8 +23,8 @@ describe Mantle do
 
   describe ".receive_message" do
     it 'delegates to message handler' do
-      expect(Mantle.configuration.message_handler).to receive(:receive).with("update", "deal", {})
-      Mantle.receive_message("update", "deal", {})
+      expect(Mantle.configuration.message_handler).to receive(:receive).with("deal", "update", {})
+      Mantle.receive_message("deal", "update", {})
     end
   end
 
