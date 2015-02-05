@@ -31,8 +31,8 @@ module Mantle
   end
 
   def self.receive_message(action, model, message)
-    Mantle.logger.debug("Handler received #{action} for #{model} ID: #{message['id']}")
-    Mantle.logger.debug("Message: #{message}")
+    Mantle.logger.debug("Handler received #{action} for #{model}")
+    Mantle.logger.debug("Mantle message: #{message}")
 
     self.configuration.message_handler.receive(action, model, message)
   end
