@@ -10,11 +10,12 @@ describe Mantle::CatchUp do
       allow(Time).to receive_message_chain(:now, :utc, :to_f).and_return(time)
       channel = "update:person"
       message = { id: 1 }
+      json_message = JSON.generate(message)
 
       catch_up = Mantle::CatchUp.new
       catch_up.message_bus_redis = redis
 
-      expect(redis).to receive(:setex).with("action_list:#{time}:#{channel}", 360, message)
+      expect(redis).to receive(:setex).with("action_list:#{time}:#{channel}", 360, json_message)
 
       catch_up.add_message(channel, message)
     end

@@ -8,7 +8,8 @@ module Mantle
     end
 
     def publish(channel, message)
-      redis.publish(channel, message)
+      json = JSON.generate(message)
+      redis.publish(channel, json)
       Mantle.logger.debug("Sent message to message bus channel: #{channel}")
     end
 

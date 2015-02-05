@@ -9,6 +9,7 @@ module Mantle
     end
 
     def add_message(channel, message)
+      json = JSON.generate(message)
       key = Mantle::CatchUp::MessageKey.new(channel)
 
       expiration_in_seconds = 6 * 60 # 6 hours
@@ -16,7 +17,7 @@ module Mantle
       message_bus_redis.setex(
         "#{message_bus_catch_up_key_name}:#{key}",
         expiration_in_seconds,
-        message
+        json
       )
 
       Mantle.logger.debug("Added message to catch up list ('#{message_bus_catch_up_key_name}') with key: #{key}")

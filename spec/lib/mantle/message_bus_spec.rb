@@ -6,11 +6,12 @@ describe Mantle::MessageBus do
       redis = double("redis")
       channel = "create:deal"
       message = { id: 1 }
+      json_message = JSON.generate(message)
 
       mb = Mantle::MessageBus.new
       mb.redis = redis
 
-      expect(redis).to receive(:publish).with(channel, message)
+      expect(redis).to receive(:publish).with(channel, json_message)
 
       mb.publish(channel, message)
     end
