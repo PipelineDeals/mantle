@@ -8,10 +8,12 @@ begin
 rescue LoadError
 end
 
-require_relative 'mantle/catch_up_handler'
+require_relative 'mantle/catch_up'
+require_relative 'mantle/catch_up/message_key'
 require_relative 'mantle/configuration'
 require_relative 'mantle/error'
 require_relative 'mantle/local_redis'
+require_relative 'mantle/message'
 require_relative 'mantle/message_bus'
 require_relative 'mantle/message_handler'
 require_relative 'mantle/message_router'
@@ -25,7 +27,7 @@ module Mantle
 
   def self.configure
     self.configuration ||= Configuration.new
-    yield(configuration)
+    yield(configuration) if block_given?
   end
 
   def self.receive_message(action, model, message)

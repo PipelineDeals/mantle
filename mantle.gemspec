@@ -6,11 +6,11 @@ require 'mantle/version'
 Gem::Specification.new do |gem|
   gem.name          = "mantle"
   gem.version       = Mantle::VERSION
-  gem.authors       = ["Grant Ammons"]
-  gem.email         = ["gammons@gmail.com"]
-  gem.description   = %q{mantle is mantling.}
-  gem.summary       = %q{you know it!}
-  gem.homepage      = ""
+  gem.authors       = ["Grant Ammons", "Brandon Hilkert"]
+  gem.email         = ["gammons@gmail.com", "brandonhilkert@gmail.com"]
+  gem.description   = %q{Ruby application message bus subscriptions.}
+  gem.summary       = %q{Ruby application message bus subscriptions.}
+  gem.homepage      = "https://github.com/PipelineDeals/mantle"
 
   gem.files         = `git ls-files`.split($/)
   gem.executables   = gem.files.grep(%r{^bin/}).map{ |f| File.basename(f) }
@@ -18,7 +18,6 @@ Gem::Specification.new do |gem|
   gem.require_paths = ["lib"]
 
   gem.add_dependency('redis')
-  gem.add_dependency('redis-namespace')
   gem.add_dependency('sidekiq')
 
   gem.add_development_dependency('rspec')

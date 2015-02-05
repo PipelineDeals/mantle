@@ -1,11 +1,15 @@
 module Mantle
   class MessageBus
-
     attr_writer :redis
 
     def initialize
       @redis = Mantle.configuration.message_bus_redis
       @channels = Mantle.configuration.message_bus_channels
+    end
+
+    def publish(channel, message)
+      redis.publish(channel, message)
+      Mantle.logger.debug("Sent message to message bus channel: #{channel}")
     end
 
     def listen
@@ -16,7 +20,7 @@ module Mantle
     end
 
     def catch_up
-      CatchUpHandler.new.catch_up
+      Mantle::CatchUp.new.catch_up
     end
 
     def subscribe_to_channels

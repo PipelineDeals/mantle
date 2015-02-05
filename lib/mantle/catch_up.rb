@@ -1,10 +1,25 @@
 module Mantle
-  class CatchUpHandler
-    attr_reader :message_bus_redis, :message_bus_catch_up_key_name
+  class CatchUp
+    attr_accessor :message_bus_redis
+    attr_reader :message_bus_catch_up_key_name
 
     def initialize
       @message_bus_redis = Mantle.configuration.message_bus_redis
       @message_bus_catch_up_key_name = Mantle.configuration.message_bus_catch_up_key_name
+    end
+
+    def add_message(channel, message)
+      key = Mantle::CatchUp::MessageKey.new(channel)
+
+      expiration_in_seconds = 6 * 60 # 6 hours
+
+      message_bus_redis.setex(
+        "#{message_bus_catch_up_key_name}:#{key}",
+        expiration_in_seconds,
+        message
+      )
+
+      Mantle.logger.debug("Added message to catch up list ('#{message_bus_catch_up_key_name}') with key: #{key}")
     end
 
     def catch_up
@@ -49,7 +64,6 @@ module Mantle
       keys.each do |key|
         _, timestamp, model, action, id = key.split(':')
         if timestamp.to_f > last_success_time.to_f
-          channel = "#{action}:#{model}"
           message = message_bus_redis.get(key)
           Mantle::MessageRouter.new(action, model, message).route
         end

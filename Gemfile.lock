@@ -1,9 +1,8 @@
 PATH
   remote: .
   specs:
-    mantle (1.0.0)
+    mantle (1.1.0)
       redis
-      redis-namespace
       sidekiq
 
 GEM

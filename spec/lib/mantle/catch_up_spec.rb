@@ -1,15 +1,28 @@
 require 'spec_helper'
 
-describe Mantle::CatchUpHandler do
-  let(:handler) { Mantle::CatchUpHandler.new }
+describe Mantle::CatchUp do
+  let(:handler) { Mantle::CatchUp.new }
 
-  before :each do
-    allow(Mantle).to receive(:message_bus_catch_up_key_name) { "action_list" }
+  describe "#add_message" do
+    it "adds message to redis that expires in 6 hours" do
+      redis = double("redis")
+      time = 1370533530.12034
+      allow(Time).to receive_message_chain(:now, :utc, :to_f).and_return(time)
+      channel = "update:person"
+      message = { id: 1 }
+
+      catch_up = Mantle::CatchUp.new
+      catch_up.message_bus_redis = redis
+
+      expect(redis).to receive(:setex).with("action_list:#{time}:#{channel}", 360, message)
+
+      catch_up.add_message(channel, message)
+    end
   end
 
   describe "catch_up" do
     it "raises when redis connection is missing" do
-      cu = Mantle::CatchUpHandler.new
+      cu = Mantle::CatchUp.new
 
       expect {
         cu.catch_up
@@ -64,10 +77,12 @@ describe Mantle::CatchUpHandler do
     let(:keys_not_seen) { ["action_list:1370533530.12034:contact:update:106", "action_list:1370533534.67259:contact:update:103"] }
 
     it "finds the right keys" do
+      redis = double("redis")
+      handler.message_bus_redis = redis
       allow(handler).to receive(:last_success_time) { Time.at(1370533_529) }
       allow(Time).to receive(:now) { Time.at(1370533_560) }
       allow(handler.message_bus_redis).
-          to receive(:keys).with("#{Mantle.message_bus_catch_up_key_name}:13705335*") { keys_not_seen }
+        to receive(:keys).with("#{Mantle.configuration.message_bus_catch_up_key_name}:13705335*") { keys_not_seen }
       expect(handler.get_keys_to_catch_up_on).to eq keys_not_seen
     end
   end
