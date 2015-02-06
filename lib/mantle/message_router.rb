@@ -12,7 +12,7 @@ module Mantle
       Mantle.logger.debug("Routing message for #{model}:#{action}")
       Mantle.logger.debug("Message: #{parsed_json}")
 
-      Mantle::Worker.perform_async(model, action, parsed_json)
+      Mantle::Workers::ProcessWorker.perform_async(model, action, parsed_json)
     end
 
     private

@@ -24,6 +24,10 @@ module Mantle
       Mantle.logger.debug("Added message to catch up list ('#{message_bus_catch_up_key_name}') with key: #{key}")
     end
 
+    def clear_expired
+
+    end
+
     def catch_up
       raise Mantle::Error::MissingRedisConnection unless message_bus_redis
 

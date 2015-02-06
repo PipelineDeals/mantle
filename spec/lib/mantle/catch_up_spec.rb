@@ -31,6 +31,16 @@ describe Mantle::CatchUp do
     end
   end
 
+  describe "catch_up" do
+    it "raises when redis connection is missing" do
+      cu = Mantle::CatchUp.new
+
+      expect {
+        cu.catch_up
+      }.to raise_error(Mantle::Error::MissingRedisConnection)
+    end
+  end
+
   describe "#compare_times" do
     context "when the times are the same" do
       let(:t1) { 10_000 }
