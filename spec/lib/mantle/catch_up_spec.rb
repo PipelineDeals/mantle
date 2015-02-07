@@ -24,16 +24,7 @@ describe Mantle::CatchUp do
   describe "catch_up" do
     it "raises when redis connection is missing" do
       cu = Mantle::CatchUp.new
-
-      expect {
-        cu.catch_up
-      }.to raise_error(Mantle::Error::MissingRedisConnection)
-    end
-  end
-
-  describe "catch_up" do
-    it "raises when redis connection is missing" do
-      cu = Mantle::CatchUp.new
+      cu.message_bus_redis = nil
 
       expect {
         cu.catch_up

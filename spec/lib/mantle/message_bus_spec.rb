@@ -40,6 +40,8 @@ describe Mantle::MessageBus do
   describe "#subscribe_to_channels" do
     it "raises without redis connection" do
       mb = Mantle::MessageBus.new
+      mb.redis = nil
+
       expect {
         mb.subscribe_to_channels
       }.to raise_error(Mantle::Error::MissingRedisConnection)
