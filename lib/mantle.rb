@@ -9,7 +9,6 @@ rescue LoadError
 end
 
 require_relative 'mantle/catch_up'
-require_relative 'mantle/catch_up/message_key'
 require_relative 'mantle/configuration'
 require_relative 'mantle/error'
 require_relative 'mantle/local_redis'
