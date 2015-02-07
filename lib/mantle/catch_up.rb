@@ -11,7 +11,7 @@ module Mantle
     end
 
     def add_message(channel, message)
-      json = serialize(channel, message)
+      json = serialize_payload(channel, message)
       message_bus_redis.zadd(key, Time.now.utc.to_f, json)
       Mantle.logger.debug("Added message to catch up list ('#{message_bus_catch_up_key_name}') with key: #{key}")
     end
@@ -72,14 +72,14 @@ module Mantle
       end
     end
 
-    private
-
-    def deserialize(payload)
+    def deserialize_payload(payload)
       res = JSON.parse(payload)
-      res.fetch("channel"), res.fetch("message")
+      [res.fetch("channel"), res.fetch("message")]
     end
 
-    def serialize(channel, message)
+    private
+
+    def serialize_payload(channel, message)
       payload = { channel: channel, message: message }
       JSON.generate(payload)
     end

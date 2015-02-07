@@ -2,10 +2,10 @@ require 'spec_helper'
 
 describe Mantle::CatchUp do
   let(:handler) { Mantle::CatchUp.new }
+  let(:redis) { Mantle.configuration.message_bus_redis }
 
   before :each do
     Mantle.configuration.message_bus_redis.flushdb
-
   end
 
   after :each do
@@ -21,10 +21,11 @@ describe Mantle::CatchUp do
       catch_up = Mantle::CatchUp.new
       catch_up.add_message(channel, message)
 
-      binding.pry
-      expect(Mantle.configuration.message_bus_redis.zcount(catch_up.key, 0, "inf")).
-        to eq(1)
+      json_payload = redis.zrange(catch_up.key, 0, -1).first
+      channel, message = catch_up.deserialize_payload(json_payload)
 
+      expect(channel).to eq(channel)
+      expect(message).to eq(message)
     end
   end
 
