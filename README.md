@@ -18,9 +18,8 @@ Define message handler class with `.receive` method. For example `app/models/my_
 
 ```Ruby
 class MyMessageHandler
-  def self.receive(action, model, message)
-    puts action # => 'update'
-    puts model # => 'deal'
+  def self.receive(channel, message)
+    puts channel # => 'order'
     puts message # => { 'id' => 5, 'name' => 'Brandon' }
   end
 end
@@ -33,7 +32,7 @@ Setup a Rails initializer(`config/initializers/mantle.rb`):
 require_relative '../../app/models/mantle_message_handler'
 
 Mantle.configure do |config|
-  config.message_bus_channels = %w[account:update]
+  config.message_bus_channels = %w[account:update orders]
   config.message_bus_redis = Redis.new(host: ENV["MESSAGE_BUS_REDIS_URL"] || 'localhost')
   config.message_handler = MantleMessageHandler
 end
@@ -45,7 +44,6 @@ The config takes a number of options, many of which have defaults:
 Mantle.configure do |config|
   config.message_bus_channels = ['deal:update', 'create:person'] (default: [])
   config.message_bus_redis = Redis.new(host: 'localhost') (default: localhost)
-  config.message_bus_catch_up_key_name = "list" (default: "action_list")
   config.message_handler = MyMessageHandler (needs config)
   config.logger = Rails.logger (default: Logger.new(STDOUT))
 end
