@@ -1,27 +1,29 @@
 module Mantle
   class CatchUp
-    attr_accessor :message_bus_redis, :message_bus_channels
+    KEY = "mantle:catch_up"
+
+    attr_accessor :redis, :message_bus_channels
     attr_reader :message_bus_catch_up_key_name, :key
 
     def initialize
-      @message_bus_redis = Mantle.configuration.message_bus_redis
+      @redis = Mantle.configuration.message_bus_redis
       @message_bus_catch_up_key_name = Mantle.configuration.message_bus_catch_up_key_name
       @message_bus_channels = Mantle.configuration.message_bus_channels
-      @key = "mantle:catch_up"
+      @key = KEY
     end
 
-    def add_message(channel, message)
+    def add_message(channel, message, now = Time.now.utc.to_f)
       json = serialize_payload(channel, message)
-      message_bus_redis.zadd(key, Time.now.utc.to_f, json)
+      redis.zadd(key, now, json)
       Mantle.logger.debug("Added message to catch up list ('#{message_bus_catch_up_key_name}') with key: #{key}")
     end
 
-    def clear_expired
-
+    def clear_expired(now = Time.now.utc.to_f)
+      redis.zremrangebyscore(key, 0 , now)
     end
 
     def catch_up
-      raise Mantle::Error::MissingRedisConnection unless message_bus_redis
+      raise Mantle::Error::MissingRedisConnection unless redis
 
       Mantle.logger.info("Initialized catch up on list key: #{message_bus_catch_up_key_name}")
 
@@ -40,7 +42,7 @@ module Mantle
       sig_length = compare_times(Time.now.to_i.to_s, last_success_time.to_i.to_s)
       return unless sig_length
       prefix = last_success_time.to_i.to_s[0, sig_length]
-      message_bus_redis.keys(catch_up_key_names(prefix))
+      redis.keys(catch_up_key_names(prefix))
     end
 
     def compare_times(t1, t2)
@@ -63,7 +65,7 @@ module Mantle
         _, timestamp, model, action, id = key.split(':')
         if timestamp.to_f > last_success_time.to_f
           channel = "#{model}:#{action}"
-          message = message_bus_redis.get(key)
+          message = redis.get(key)
 
           if message_bus_channels.include?(channel)
             Mantle::MessageRouter.new(model, action, message).route

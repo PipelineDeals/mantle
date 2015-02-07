@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe Mantle::CatchUp do
   let(:handler) { Mantle::CatchUp.new }
-  let(:redis) { Mantle.configuration.message_bus_redis }
+  let(:redis) { handler.redis }
 
   before :each do
     Mantle.configuration.message_bus_redis.flushdb
@@ -29,10 +29,30 @@ describe Mantle::CatchUp do
     end
   end
 
+  describe "#clear_expired" do
+    it "clears expired entries from the catch up list" do
+      cu = Mantle::CatchUp.new
+      cu.add_message("person:update", { id: 1 }, 1.2456)
+      cu.add_message("deal:update", { id: 2 }, 2.2456)
+      cu.add_message("company:update", { id: 3 }, 3.2456)
+
+      allow(Time).to receive_message_chain(:now, :utc, :to_f).and_return(3.0)
+
+      cu.clear_expired
+
+      expect(redis.zcount(cu.key, 0, 'inf')).to eq(1)
+
+      json_payload = redis.zrange(cu.key, 0, -1).first
+      channel, message = cu.deserialize_payload(json_payload)
+
+      expect(channel).to eq("company:update")
+    end
+  end
+
   describe "catch_up" do
     it "raises when redis connection is missing" do
       cu = Mantle::CatchUp.new
-      cu.message_bus_redis = nil
+      cu.redis = nil
 
       expect {
         cu.catch_up
@@ -88,11 +108,11 @@ describe Mantle::CatchUp do
 
     it "finds the right keys" do
       redis = double("redis")
-      handler.message_bus_redis = redis
+      handler.redis = redis
 
       allow(handler).to receive(:last_success_time) { Time.at(1370533_529) }
       allow(Time).to receive(:now) { Time.at(1370533_560) }
-      allow(handler.message_bus_redis).
+      allow(handler.redis).
         to receive(:keys).with("#{Mantle.configuration.message_bus_catch_up_key_name}:13705335*") { keys_not_seen }
       expect(handler.get_keys_to_catch_up_on).to eq keys_not_seen
     end
@@ -104,7 +124,7 @@ describe Mantle::CatchUp do
     let(:redis) { double(get: json, keys: message) }
 
     before do
-      handler.message_bus_redis = redis
+      handler.redis = redis
       handler.message_bus_channels = ["contact:update"]
 
       allow(handler).to receive(:last_success_time) { Time.at(1) }
