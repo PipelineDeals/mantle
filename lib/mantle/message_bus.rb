@@ -30,8 +30,10 @@ module Mantle
       Mantle.logger.info("Subscribing to message bus for #{channels} ")
 
       redis.subscribe(channels) do |on|
-        on.message do |channel, message|
+        on.message do |channel, json_message|
           action, model = channel.split(":")
+          message = JSON.parse(json_message)
+
           Mantle::MessageRouter.new(action, model, message).route
         end
       end

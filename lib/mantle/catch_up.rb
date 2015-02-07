@@ -32,28 +32,23 @@ module Mantle
 
       Mantle.logger.info("Catching up from time: #{last_success_time}")
 
-      messages = redis.zrangebyscore(key, last_success_time, 'inf', with_scores: true)
-      route_messages(messages) if messages.any?
+      payloads_with_time = redis.zrangebyscore(key, last_success_time, 'inf', with_scores: true)
+      route_messages(payloads_with_time) if payloads_with_time.any?
     end
 
     def last_success_time
       LocalRedis.last_message_successfully_received_at
     end
 
-    def route_messages(messages)
+    def route_messages(payloads_with_time)
+      payloads_with_time.each do |payload_with_time|
+        payload, time = payload_with_time
+        channel, message = deserialize_payload(payload)
 
-    end
+        model, action = channel.split(":")
 
-    def handle_messages_since_last_success(keys)
-      keys.each do |key|
-        _, timestamp, model, action, id = key.split(':')
-        if timestamp.to_f > last_success_time.to_f
-          channel = "#{model}:#{action}"
-          message = redis.get(key)
-
-          if message_bus_channels.include?(channel)
-            Mantle::MessageRouter.new(model, action, message).route
-          end
+        if message_bus_channels.include?(channel)
+          Mantle::MessageRouter.new(model, action, message).route
         end
       end
     end

@@ -120,37 +120,28 @@ describe Mantle::CatchUp do
     end
   end
 
-  # describe "#handle_messages_since_last_success" do
-  #   let(:json) { "\"message\"" }
-  #   let(:message_router) { double(route: true) }
-  #   let(:redis) { double(get: json, keys: message) }
-  #
-  #   before do
-  #     handler.redis = redis
-  #     handler.message_bus_channels = ["contact:update"]
-  #
-  #     allow(handler).to receive(:last_success_time) { Time.at(1) }
-  #     allow(Time).to receive(:now) { Time.at(2) }
-  #     Mantle.logger.level = Logger::WARN
-  #   end
-  #
-  #   context 'message published on channel listed in Mantle.message_bus_channels' do
-  #     let(:message) { ["action_list:1370533530.12034:contact:update:106"] }
-  #
-  #     it "routes the messages" do
-  #       expect(Mantle::MessageRouter).to receive(:new).with("contact", "update", json).and_return(message_router)
-  #       handler.catch_up
-  #     end
-  #   end
-  #
-  #   context 'message published on channel NOT listed in Mantle.message_bus_channels' do
-  #     let(:message) { ["action_list:1370533530.12034:account:update:1"] }
-  #
-  #     it "does not route the message" do
-  #       expect(Mantle::MessageRouter).to_not receive(:new).with("account", "update", json)
-  #       handler.catch_up
-  #     end
-  #   end
-  # end
+  describe "#route_messages" do
+    it "process messages if listening to that channel" do
+      p =[["{\"channel\":\"user:update\",\"message\":{\"id\":3}}", 1423336645.314663]]
+      cu = Mantle::CatchUp.new
+      cu.message_bus_channels = ["user:update"]
+
+      expect(Mantle::MessageRouter).to receive(:new).with(
+        "user", "update", { "id" => 3 }
+      ).and_return(double("router", route: true))
+
+      cu.route_messages(p)
+    end
+
+    it "skips messages on channels not subscribed" do
+      p =[["{\"channel\":\"user:update\",\"message\":{\"id\":3}}", 1423336645.314663]]
+      cu = Mantle::CatchUp.new
+      cu.message_bus_channels = ["user:create"]
+
+      expect(Mantle::MessageRouter).to_not receive(:new)
+
+      cu.route_messages(p)
+    end
+  end
 end
 

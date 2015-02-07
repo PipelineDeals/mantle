@@ -13,7 +13,7 @@ describe Mantle::MessageRouter do
     context "routing create messages" do
       it "enqueues job and gets message" do
         expect {
-          Mantle::MessageRouter.new("person", "create", message.to_json).route
+          Mantle::MessageRouter.new("person", "create", message).route
         }.to change(Mantle::Workers::ProcessWorker.jobs, :size).by(1)
 
         args = Mantle::Workers::ProcessWorker.jobs.first["args"]
@@ -26,7 +26,7 @@ describe Mantle::MessageRouter do
     context "routing update messages" do
       it "enqueues job and gets message" do
         expect {
-          Mantle::MessageRouter.new("person", "update", message.to_json).route
+          Mantle::MessageRouter.new("person", "update", message).route
         }.to change(Mantle::Workers::ProcessWorker.jobs, :size).by(1)
 
         args = Mantle::Workers::ProcessWorker.jobs.first["args"]
@@ -39,7 +39,7 @@ describe Mantle::MessageRouter do
     context "routing delete messages" do
       it "enqueues job and gets message" do
         expect {
-          Mantle::MessageRouter.new("person", "delete", message.to_json).route
+          Mantle::MessageRouter.new("person", "delete", message).route
         }.to change(Mantle::Workers::ProcessWorker.jobs, :size).by(1)
 
         args = Mantle::Workers::ProcessWorker.jobs.first["args"]
@@ -52,7 +52,7 @@ describe Mantle::MessageRouter do
     context "routing non-CRUD messages" do
       it "enqueues job and gets message" do
         expect {
-          Mantle::MessageRouter.new("user", "login", message.to_json).route
+          Mantle::MessageRouter.new("user", "login", message).route
         }.to change(Mantle::Workers::ProcessWorker.jobs, :size).by(1)
 
         args = Mantle::Workers::ProcessWorker.jobs.first["args"]
