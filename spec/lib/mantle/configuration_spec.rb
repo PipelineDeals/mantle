@@ -19,12 +19,6 @@ describe Mantle::Configuration do
     expect(config.message_bus_channels).to eq(redis)
   end
 
-  it 'can set/get message_bus_catch_up_key_name' do
-    config = Mantle::Configuration.new
-    config.message_bus_catch_up_key_name = "party"
-    expect(config.message_bus_catch_up_key_name).to eq("party")
-  end
-
   it 'can set/get message_handler' do
     FakeHandler = Class.new
 
