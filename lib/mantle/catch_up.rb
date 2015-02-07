@@ -24,9 +24,10 @@ module Mantle
     def catch_up
       raise Mantle::Error::MissingRedisConnection unless redis
 
-      Mantle.logger.info("Initializing catch up...")
-
-      return if last_success_time.nil?
+      if last_success_time.nil?
+        Mantle.logger.info("Skipping catch up because of missing last processed time...")
+        return
+      end
 
       Mantle.logger.info("Catching up from time: #{last_success_time}")
       keys = get_keys_to_catch_up_on

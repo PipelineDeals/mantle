@@ -58,6 +58,14 @@ describe Mantle::CatchUp do
         cu.catch_up
       }.to raise_error(Mantle::Error::MissingRedisConnection)
     end
+
+    it "doesn't process anything when no last successfully processed message time has been record" do
+      # doesn't trigger imethod at all
+    end
+
+    it "handles all messages that need catch up" do
+      # spect that imethod receives array of keys
+    end
   end
 
   describe "#last_success_time" do
