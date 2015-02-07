@@ -30,11 +30,11 @@ module Mantle
     yield(configuration) if block_given?
   end
 
-  def self.receive_message(model, action, message)
-    Mantle.logger.debug("Handler received #{model}:#{action}")
+  def self.receive_message(channel, message)
+    Mantle.logger.debug("Message received on channel: #{channel}")
     Mantle.logger.debug("Mantle message: #{message}")
 
-    self.configuration.message_handler.receive(model, action, message)
+    self.configuration.message_handler.receive(channel, message)
   end
 
   def self.logger

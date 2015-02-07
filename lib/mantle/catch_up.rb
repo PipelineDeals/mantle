@@ -45,10 +45,8 @@ module Mantle
         payload, time = payload_with_time
         channel, message = deserialize_payload(payload)
 
-        model, action = channel.split(":")
-
         if message_bus_channels.include?(channel)
-          Mantle::MessageRouter.new(model, action, message).route
+          Mantle::MessageRouter.new(channel, message).route
         end
       end
     end

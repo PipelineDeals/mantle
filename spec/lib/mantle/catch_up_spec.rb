@@ -127,7 +127,7 @@ describe Mantle::CatchUp do
       cu.message_bus_channels = ["user:update"]
 
       expect(Mantle::MessageRouter).to receive(:new).with(
-        "user", "update", { "id" => 3 }
+        "user:update", { "id" => 3 }
       ).and_return(double("router", route: true))
 
       cu.route_messages(p)

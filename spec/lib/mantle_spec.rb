@@ -3,9 +3,7 @@ require 'spec_helper'
 describe Mantle do
   describe ".configure" do
     it 'allows multiple configuration' do
-      Mantle.configure do |config|
-      end
-
+      Mantle.configure { |c| }
       Mantle.configuration.message_bus_redis = "redis"
       expect(Mantle.configuration.message_bus_redis).to eq("redis")
     end
@@ -13,8 +11,8 @@ describe Mantle do
 
   describe ".receive_message" do
     it 'delegates to message handler' do
-      expect(Mantle.configuration.message_handler).to receive(:receive).with("deal", "update", {})
-      Mantle.receive_message("deal", "update", {})
+      expect(Mantle.configuration.message_handler).to receive(:receive).with("deal:update", {})
+      Mantle.receive_message("deal:update", {})
     end
   end
 

@@ -5,14 +5,14 @@ describe Mantle::Workers::ProcessWorker do
 
   describe "#perform" do
     it "processes message" do
-      expect(Mantle).to receive(:receive_message).with("person", "update", message) { true }
-      Mantle::Workers::ProcessWorker.new.perform("person", "update", message)
+      expect(Mantle).to receive(:receive_message).with("person:update", message) { true }
+      Mantle::Workers::ProcessWorker.new.perform("person:update", message)
     end
 
     it "sets the last processed message" do
       allow(Mantle).to receive_messages(receive_message: true)
       expect(Mantle::LocalRedis).to receive(:set_message_successfully_received){ true }
-      Mantle::Workers::ProcessWorker.new.perform("person", "update", message)
+      Mantle::Workers::ProcessWorker.new.perform("person:update", message)
     end
   end
 end

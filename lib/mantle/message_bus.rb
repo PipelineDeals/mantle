@@ -31,10 +31,8 @@ module Mantle
 
       redis.subscribe(channels) do |on|
         on.message do |channel, json_message|
-          action, model = channel.split(":")
           message = JSON.parse(json_message)
-
-          Mantle::MessageRouter.new(action, model, message).route
+          Mantle::MessageRouter.new(channel, message).route
         end
       end
     end
