@@ -3,21 +3,28 @@ require 'spec_helper'
 describe Mantle::CatchUp do
   let(:handler) { Mantle::CatchUp.new }
 
+  before :each do
+    Mantle.configuration.message_bus_redis.flushdb
+
+  end
+
+  after :each do
+    Mantle.configuration.message_bus_redis.flushdb
+  end
+
   describe "#add_message" do
     it "adds message to redis that expires in 6 hours" do
-      redis = double("redis")
-      time = 1370533530.12034
-      allow(Time).to receive_message_chain(:now, :utc, :to_f).and_return(time)
       channel = "person:update"
       message = { id: 1 }
       json_message = JSON.generate(message)
 
       catch_up = Mantle::CatchUp.new
-      catch_up.message_bus_redis = redis
-
-      expect(redis).to receive(:setex).with("action_list:#{time}:#{channel}", 360, json_message)
-
       catch_up.add_message(channel, message)
+
+      binding.pry
+      expect(Mantle.configuration.message_bus_redis.zcount(catch_up.key, 0, "inf")).
+        to eq(1)
+
     end
   end
 

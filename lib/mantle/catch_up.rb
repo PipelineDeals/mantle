@@ -1,26 +1,18 @@
 module Mantle
   class CatchUp
     attr_accessor :message_bus_redis, :message_bus_channels
-    attr_reader :message_bus_catch_up_key_name
+    attr_reader :message_bus_catch_up_key_name, :key
 
     def initialize
       @message_bus_redis = Mantle.configuration.message_bus_redis
       @message_bus_catch_up_key_name = Mantle.configuration.message_bus_catch_up_key_name
       @message_bus_channels = Mantle.configuration.message_bus_channels
+      @key = "mantle:catch_up"
     end
 
     def add_message(channel, message)
-      json = JSON.generate(message)
-      key = Mantle::CatchUp::MessageKey.new(channel)
-
-      expiration_in_seconds = 6 * 60 # 6 hours
-
-      message_bus_redis.setex(
-        "#{message_bus_catch_up_key_name}:#{key}",
-        expiration_in_seconds,
-        json
-      )
-
+      json = serialize(channel, message)
+      message_bus_redis.zadd(key, Time.now.utc.to_f, json)
       Mantle.logger.debug("Added message to catch up list ('#{message_bus_catch_up_key_name}') with key: #{key}")
     end
 
@@ -78,6 +70,18 @@ module Mantle
           end
         end
       end
+    end
+
+    private
+
+    def deserialize(payload)
+      res = JSON.parse(payload)
+      res.fetch("channel"), res.fetch("message")
+    end
+
+    def serialize(channel, message)
+      payload = { channel: channel, message: message }
+      JSON.generate(payload)
     end
   end
 end
