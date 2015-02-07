@@ -15,6 +15,7 @@ module Mantle
       json = serialize_payload(channel, message)
       redis.zadd(key, now, json)
       Mantle.logger.debug("Added message to catch up list for channel: #{channel}")
+      now
     end
 
     def clear_expired(now = Time.now.utc.to_f)
@@ -30,12 +31,17 @@ module Mantle
       end
 
       Mantle.logger.info("Catching up from time: #{last_success_time}")
-      keys = get_keys_to_catch_up_on
-      handle_messages_since_last_success(sort_keys(keys))
+
+      messages = redis.zrangebyscore(key, last_success_time, 'inf', with_scores: true)
+      route_messages(messages) if messages.any?
     end
 
     def last_success_time
       LocalRedis.last_message_successfully_received_at
+    end
+
+    def route_messages(messages)
+
     end
 
     def handle_messages_since_last_success(keys)

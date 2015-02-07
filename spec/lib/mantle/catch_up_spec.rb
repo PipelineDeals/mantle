@@ -5,6 +5,7 @@ describe Mantle::CatchUp do
   let(:redis) { handler.redis }
 
   before :each do
+    Mantle.logger.level = Logger::WARN
     Mantle.configuration.message_bus_redis.flushdb
   end
 
@@ -26,6 +27,12 @@ describe Mantle::CatchUp do
 
       expect(channel).to eq(channel)
       expect(message).to eq(message)
+    end
+
+    it "returns time for message" do
+      catch_up = Mantle::CatchUp.new
+      time = catch_up.add_message("person:update", { id: 1 }, 1234.56)
+      expect(time).to eq(1234.56)
     end
   end
 
@@ -59,12 +66,50 @@ describe Mantle::CatchUp do
       }.to raise_error(Mantle::Error::MissingRedisConnection)
     end
 
-    it "doesn't process anything when no last successfully processed message time has been record" do
-      # doesn't trigger imethod at all
+    it "skips if no successfully processed time has been recorded" do
+      cu = Mantle::CatchUp.new
+
+      cu.add_message("person:update", { id: 1 })
+      cu.add_message("deal:update", { id: 2 })
+      cu.add_message("company:update", { id: 3 })
+      time = cu.add_message("user:update", { id: 3 })
+
+      expect(cu).to_not receive(:route_messages)
+
+      cu.catch_up
+    end
+
+    it "doesn't process anything when system is up to date no last successfully processed message time has been record" do
+      cu = Mantle::CatchUp.new
+
+      cu.add_message("person:update", { id: 1 })
+      cu.add_message("deal:update", { id: 2 })
+      cu.add_message("company:update", { id: 3 })
+      time = cu.add_message("user:update", { id: 3 })
+
+      Mantle::LocalRedis.set_message_successfully_received
+
+      expect(cu).to_not receive(:route_messages)
+
+      cu.catch_up
     end
 
     it "handles all messages that need catch up" do
-      # spect that imethod receives array of keys
+      cu = Mantle::CatchUp.new
+
+      cu.add_message("person:update", { id: 1 })
+      cu.add_message("deal:update", { id: 2 })
+      cu.add_message("company:update", { id: 3 })
+
+      Mantle::LocalRedis.set_message_successfully_received
+
+      time = cu.add_message("user:update", { id: 3 })
+
+      expect(cu).to receive(:route_messages).with(
+        [["{\"channel\":\"user:update\",\"message\":{\"id\":3}}", time]]
+      )
+
+      cu.catch_up
     end
   end
 
