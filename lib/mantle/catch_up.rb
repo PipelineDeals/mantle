@@ -1,6 +1,7 @@
 module Mantle
   class CatchUp
     KEY = "mantle:catch_up"
+    HOURS_TO_KEEP = 6
 
     attr_accessor :redis, :message_bus_channels
     attr_reader :key
@@ -18,8 +19,9 @@ module Mantle
       now
     end
 
-    def clear_expired(now = Time.now.utc.to_f)
-      redis.zremrangebyscore(key, 0 , now)
+    def clear_expired
+      max_time_to_clear = hours_ago_in_seconds(HOURS_TO_KEEP)
+      redis.zremrangebyscore(key, 0 , max_time_to_clear)
     end
 
     def catch_up
@@ -54,6 +56,11 @@ module Mantle
     def deserialize_payload(payload)
       res = JSON.parse(payload)
       [res.fetch("channel"), res.fetch("message")]
+    end
+
+    def hours_ago_in_seconds(hours)
+      hour_seconds = 60 * 60 * hours
+      Time.now.utc.to_f - hour_seconds
     end
 
     private
