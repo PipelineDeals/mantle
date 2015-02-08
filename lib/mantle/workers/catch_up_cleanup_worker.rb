@@ -6,6 +6,7 @@ module Mantle
       sidekiq_options queue: :mantle
 
       def perform
+        Mantle::CatchUp.new.clear_expired
       end
     end
   end
