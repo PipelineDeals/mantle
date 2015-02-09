@@ -6,7 +6,7 @@ describe Mantle::LocalRedis do
       time = "1234"
       response = Mantle::LocalRedis.set_message_successfully_received(time)
       expect(Mantle::LocalRedis.last_message_successfully_received_at).to eq(1234.0)
-      expect(response).to eq(time)
+      expect(response).to eq(1234.0)
     end
   end
 
@@ -19,6 +19,11 @@ describe Mantle::LocalRedis do
     it "returns nil if nothing has been set" do
       expect(Mantle::LocalRedis.last_message_successfully_received_at).to eq(nil)
     end
+  end
+
+  it 'sets and gets the last time the catch up was cleaned up' do
+    Mantle::LocalRedis.set_catch_up_cleanup(1234.0)
+    expect(Mantle::LocalRedis.last_catch_up_cleanup_at).to eq(1234.0)
   end
 end
 

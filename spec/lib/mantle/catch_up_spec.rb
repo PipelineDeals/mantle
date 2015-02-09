@@ -36,6 +36,34 @@ describe Mantle::CatchUp do
     end
   end
 
+  describe "#enqueue_clear_if_ready" do
+    it "enqueues clear job if it was done more than 5 min. ago" do
+      time = Time.now.utc.to_f - (6 * 60.0)
+      Mantle::LocalRedis.set_catch_up_cleanup(time)
+
+      expect {
+        Mantle::CatchUp.new.enqueue_clear_if_ready
+      }.to change(Mantle::Workers::CatchUpCleanupWorker.jobs, :size).by(1)
+    end
+
+    it "enqueues clear job if no last cleanup time has been recorded" do
+      Mantle::LocalRedis.set_catch_up_cleanup(nil)
+
+      expect {
+        Mantle::CatchUp.new.enqueue_clear_if_ready
+      }.to change(Mantle::Workers::CatchUpCleanupWorker.jobs, :size).by(1)
+    end
+
+    it "doesn't enqueue a clear job if enough time hasn't passed" do
+      time = Time.now.utc.to_f - (4 * 60.0)
+      Mantle::LocalRedis.set_catch_up_cleanup(time)
+
+      expect {
+        Mantle::CatchUp.new.enqueue_clear_if_ready
+      }.to_not change(Mantle::Workers::CatchUpCleanupWorker.jobs, :size)
+    end
+  end
+
   describe "#clear_expired" do
     it "clears expired entries from the catch up list" do
       cu = Mantle::CatchUp.new

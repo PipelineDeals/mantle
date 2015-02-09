@@ -11,6 +11,7 @@ RSpec.configure do |config|
     end
 
     Mantle::LocalRedis.set_message_successfully_received(nil)
+    Mantle::LocalRedis.set_catch_up_cleanup(nil)
 
     Sidekiq::Worker.clear_all
   end

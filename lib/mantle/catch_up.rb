@@ -2,6 +2,7 @@ module Mantle
   class CatchUp
     KEY = "mantle:catch_up"
     HOURS_TO_KEEP = 6
+    CLEANUP_EVERY_MINUTES = 5
 
     attr_accessor :redis, :message_bus_channels
     attr_reader :key
@@ -17,6 +18,16 @@ module Mantle
       redis.zadd(key, now, json)
       Mantle.logger.debug("Added message to catch up list for channel: #{channel}")
       now
+    end
+
+    def enqueue_clear_if_ready
+      now = Time.now.utc.to_f
+      five_minutes_ago = now - (CLEANUP_EVERY_MINUTES * 60.0)
+      last_cleanup = Mantle::LocalRedis.last_catch_up_cleanup_at
+
+      if last_cleanup.nil? || last_cleanup < five_minutes_ago
+        Mantle::Workers::CatchUpCleanupWorker.perform_async
+      end
     end
 
     def clear_expired
