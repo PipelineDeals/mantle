@@ -13,7 +13,6 @@ or install manually by:
 
 ## Usage (in Rails App)
 
-
 Define message handler class with `.receive` method. For example `app/models/my_message_handler.rb`
 
 ```Ruby
@@ -49,29 +48,37 @@ Mantle.configure do |config|
 end
 ```
 
+To make the installation of mantle easier, the following command will create
+these files in a Rails application:
+
+```
+$ rails g mantle:install
+```
+
+
 To run the listener:
 
 ```
-bin/mantle
+$ bin/mantle
 ```
 
 or with configuration:
 
 ```
-bin/mantle -c ./config/initializers/other_file.rb
+$ bin/mantle -c ./config/initializers/other_file.rb
 ```
 
 To run the processor:
 
 ```
-bin/sidekiq -q mantle
+$ bin/sidekiq -q mantle
 ```
 
 If the Sidekiq worker should also listen on another queue, add that to the
 command with:
 
 ```
-bin/sidekiq -q mantle -q default
+$ bin/sidekiq -q mantle -q default
 ```
 
 It will NOT add the `default` queue to processing if there are other queues

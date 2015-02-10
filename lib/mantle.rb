@@ -20,6 +20,8 @@ require_relative 'mantle/workers/catch_up_cleanup_worker'
 require_relative 'mantle/workers/process_worker'
 require_relative 'mantle/version'
 
+require_relative 'mantle/railtie' if defined?(Rails)
+
 module Mantle
   class << self
     attr_accessor :configuration
