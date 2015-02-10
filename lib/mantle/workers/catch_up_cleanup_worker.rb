@@ -7,6 +7,7 @@ module Mantle
 
       def perform
         Mantle::CatchUp.new.clear_expired
+        Mantle::LocalRedis.set_catch_up_cleanup
       end
     end
   end

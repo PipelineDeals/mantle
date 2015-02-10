@@ -9,6 +9,11 @@ describe Mantle::Workers::CatchUpCleanupWorker do
       expect(cu).to receive(:clear_expired)
       Mantle::Workers::CatchUpCleanupWorker.new.perform
     end
+
+    it "sets catch up cleanup time" do
+      expect(Mantle::LocalRedis).to receive(:set_catch_up_cleanup)
+      Mantle::Workers::CatchUpCleanupWorker.new.perform
+    end
   end
 end
 

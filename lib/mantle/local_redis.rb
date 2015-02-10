@@ -14,7 +14,7 @@ module Mantle
       process_redis_response(result)
     end
 
-    def self.set_catch_up_cleanup(time = Time.now.utf.to_f.to_s)
+    def self.set_catch_up_cleanup(time = Time.now.utc.to_f.to_s)
       Sidekiq.redis { |conn| conn.set(CATCH_UP_CLEANUP_KEY, time) }
       Mantle.logger.debug("Set last catch up cleanup time: #{time}")
       process_redis_response(time)
