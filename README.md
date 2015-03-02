@@ -48,6 +48,8 @@ Mantle.configure do |config|
   config.message_bus_catch_up_key_name = "list" (default: "action_list")
   config.message_handler = MyMessageHandler (needs config)
   config.logger = Rails.logger (default: Logger.new(STDOUT))
+  config.redis_name = "my-namespace" (default: no namespace - assumes uses
+  ENV["REDIS_URL"] for local serialization)
 end
 ```
 
