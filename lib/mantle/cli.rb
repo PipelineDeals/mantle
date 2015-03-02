@@ -49,6 +49,8 @@ module Mantle
 
     def configure_sidekiq
       if namespace = Mantle.configuration.redis_namespace
+        Mantle.logger.info("Configuring Mantle to listen on Redis namespace: #{namespace}")
+
         Sidekiq.configure_client do |config|
           config.redis = { url: ENV["REDIS_URL"], namespace: namespace }
         end
