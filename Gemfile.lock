@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    mantle (1.1.0)
+    mantle (1.2.0)
       redis
       sidekiq
 
@@ -20,7 +20,7 @@ GEM
       coderay (~> 1.1.0)
       method_source (~> 0.8.1)
       slop (~> 3.4)
-    redis (3.2.0)
+    redis (3.2.1)
     redis-namespace (1.5.1)
       redis (~> 3.0, >= 3.0.4)
     rspec (3.2.0)
@@ -36,7 +36,7 @@ GEM
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.2.0)
     rspec-support (3.2.0)
-    sidekiq (3.3.1)
+    sidekiq (3.3.2)
       celluloid (>= 0.16.0)
       connection_pool (>= 2.1.1)
       json
