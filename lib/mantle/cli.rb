@@ -13,6 +13,7 @@ module Mantle
     def setup(args = ARGV)
       parse_options(args)
       load_config
+      configure_sidekiq
     end
 
     def parse_options(args)
@@ -43,6 +44,14 @@ module Mantle
         require File.expand_path(options[:config])
       else
         require File.expand_path("./config/initializers/mantle")
+      end
+    end
+
+    def configure_sidekiq
+      if namespace = Mantle.configuration.redis_namespace
+        Sidekiq.configure_client do |config|
+          config.redis = { url: ENV["REDIS_URL"], namespace: namespace }
+        end
       end
     end
 

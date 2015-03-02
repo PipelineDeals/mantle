@@ -7,13 +7,15 @@ module Mantle
       :message_bus_redis,
       :message_bus_catch_up_key_name,
       :message_handler,
-      :logger
+      :logger,
+      :redis_namespace
 
     def initialize
       @message_bus_channels = []
       @message_bus_catch_up_key_name = "action_list"
       @message_handler = Mantle::MessageHandler
       @logger = default_logger
+      @redis_namespace = nil
     end
 
     private
