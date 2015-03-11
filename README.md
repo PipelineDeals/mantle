@@ -48,6 +48,17 @@ Mantle.configure do |config|
 end
 ```
 
+If an application only pushes messages on to the queue and doesn't listen, the
+following configuration is all that's needed:
+
+
+```Ruby
+Mantle.configure do |config|
+  config.message_bus_redis = Redis.new(host: 'localhost') # default: localhost
+  config.logger = Rails.logger # default: Logger.new(STDOUT)
+end
+```
+
 To make the installation of mantle easier, the following command will create
 these files in a Rails application:
 
