@@ -38,7 +38,7 @@ describe Mantle::CatchUp do
 
   describe "#enqueue_clear_if_ready" do
     it "enqueues clear job if it was done more than 5 min. ago" do
-      time = Time.now.utc.to_f - (6 * 60.0)
+      time = Time.now.utc.to_f - ((Mantle::CatchUp::CLEANUP_EVERY_MINUTES + 1) * 60.0)
       Mantle::LocalRedis.set_catch_up_cleanup(time)
 
       expect {
@@ -55,7 +55,7 @@ describe Mantle::CatchUp do
     end
 
     it "doesn't enqueue a clear job if enough time hasn't passed" do
-      time = Time.now.utc.to_f - (4 * 60.0)
+      time = Time.now.utc.to_f - ((Mantle::CatchUp::CLEANUP_EVERY_MINUTES - 1) * 60.0)
       Mantle::LocalRedis.set_catch_up_cleanup(time)
 
       expect {
