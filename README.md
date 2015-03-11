@@ -13,19 +13,6 @@ or install manually by:
 
 ## Usage (in Rails App)
 
-
-Define message handler class with `.receive` method. For example `app/models/my_message_handler.rb`
-
-```Ruby
-class MyMessageHandler
-  def self.receive(action, model, message)
-    puts action # => 'update'
-    puts model # => 'deal'
-    puts message # => { 'id' => 5, 'name' => 'Brandon' }
-  end
-end
-```
-
 Setup a Rails initializer(`config/initializers/mantle.rb`):
 
 
@@ -50,6 +37,29 @@ Mantle.configure do |config|
   config.logger = Rails.logger (default: Logger.new(STDOUT))
   config.redis_name = "my-namespace" (default: no namespace - assumes uses
   ENV["REDIS_URL"] for local serialization)
+end
+```
+
+Publish messages to consumers:
+
+```Ruby
+Mantle::Message.new("person:create").publish({ id: message['id'], data: message['data'] })
+```
+
+The first and only argument to `Mantle::Message.new` is the channel you want to publish the
+message on. The `#publish` method takes the message payload (in any format you like)
+and pushes the message on to the message bus pub/sub and also adds it to the
+catch up queue so offline applications can process the message when they become available.
+
+Define message handler class with `.receive` method. For example `app/models/my_message_handler.rb`
+
+```Ruby
+class MyMessageHandler
+  def self.receive(action, model, message)
+    puts action # => 'update'
+    puts model # => 'deal'
+    puts message # => { 'id' => 5, 'name' => 'Brandon' }
+  end
 end
 ```
 
