@@ -6,12 +6,14 @@ module Mantle
     attr_accessor :message_bus_channels,
       :message_bus_redis,
       :message_handler,
-      :logger
+      :logger,
+      :redis_namespace
 
     def initialize
       @message_bus_channels = []
       @message_handler = Mantle::MessageHandler
       @logger = default_logger
+      @redis_namespace = nil
     end
 
     private

@@ -43,6 +43,17 @@ describe Mantle::Configuration do
     config = Mantle::Configuration.new
     expect(config.logger.level).to eq(1)
   end
+
+  it 'can set/get namespace for local redis listen' do
+    config = Mantle::Configuration.new
+    config.redis_namespace = "fake"
+    expect(config.redis_namespace).to eq("fake")
+  end
+
+  it 'configures default redis namespace' do
+    config = Mantle::Configuration.new
+    expect(config.redis_namespace).to eq(nil)
+  end
 end
 
 

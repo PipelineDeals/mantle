@@ -45,12 +45,13 @@ Mantle.configure do |config|
   config.message_bus_redis = Redis.new(host: 'localhost') # default: localhost
   config.message_handler = MyMessageHandler # requires implementation
   config.logger = Rails.logger # default: Logger.new(STDOUT)
+  config.redis_namespace = "my-namespace" # default: no namespace
 end
+
 ```
 
 If an application only pushes messages on to the queue and doesn't listen, the
 following configuration is all that's needed:
-
 
 ```Ruby
 Mantle.configure do |config|
