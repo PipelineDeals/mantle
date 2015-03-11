@@ -39,12 +39,12 @@ end
 
 The config takes a number of options, many of which have defaults:
 
-```
+```Ruby
 Mantle.configure do |config|
-  config.message_bus_channels = ['deal:update', 'create:person'] (default: [])
-  config.message_bus_redis = Redis.new(host: 'localhost') (default: localhost)
-  config.message_handler = MyMessageHandler (needs config)
-  config.logger = Rails.logger (default: Logger.new(STDOUT))
+  config.message_bus_channels = ['deal:update', 'create:person'] # default: []
+  config.message_bus_redis = Redis.new(host: 'localhost') # default: localhost
+  config.message_handler = MyMessageHandler # requires implementation
+  config.logger = Rails.logger # default: Logger.new(STDOUT)
 end
 ```
 
