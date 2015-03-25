@@ -8,8 +8,8 @@ Gem::Specification.new do |gem|
   gem.version       = Mantle::VERSION
   gem.authors       = ["Grant Ammons", "Brandon Hilkert"]
   gem.email         = ["gammons@gmail.com", "brandonhilkert@gmail.com"]
-  gem.description   = %q{Ruby application message bus subscriptions.}
-  gem.summary       = %q{Ruby application message bus subscriptions.}
+  gem.description   = %q{Ruby application message bus subscriptions with Sidekiq and Redis Pubsub.}
+  gem.summary       = %q{Ruby application message bus subscriptions with Sidekiq and Redis Pubsub.}
   gem.homepage      = "https://github.com/PipelineDeals/mantle"
 
   gem.files         = `git ls-files`.split($/)
