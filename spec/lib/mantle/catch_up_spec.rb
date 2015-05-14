@@ -2,124 +2,173 @@ require 'spec_helper'
 
 describe Mantle::CatchUp do
   let(:handler) { Mantle::CatchUp.new }
+  let(:redis) { handler.redis }
+
+  before :each do
+    Mantle.logger.level = Logger::WARN
+    Mantle.configuration.message_bus_redis.flushdb
+  end
+
+  after :each do
+    Mantle.configuration.message_bus_redis.flushdb
+  end
 
   describe "#add_message" do
     it "adds message to redis that expires in 6 hours" do
-      redis = double("redis")
-      time = 1370533530.12034
-      allow(Time).to receive_message_chain(:now, :utc, :to_f).and_return(time)
       channel = "person:update"
       message = { id: 1 }
       json_message = JSON.generate(message)
 
       catch_up = Mantle::CatchUp.new
-      catch_up.message_bus_redis = redis
-
-      expect(redis).to receive(:setex).with("action_list:#{time}:#{channel}", 360, json_message)
-
       catch_up.add_message(channel, message)
+
+      json_payload = redis.zrange(catch_up.key, 0, -1).first
+      channel, message = catch_up.deserialize_payload(json_payload)
+
+      expect(channel).to eq(channel)
+      expect(message).to eq(message)
+    end
+
+    it "returns time for message" do
+      catch_up = Mantle::CatchUp.new
+      time = catch_up.add_message("person:update", { id: 1 }, 1234.56)
+      expect(time).to eq(1234.56)
+    end
+  end
+
+  describe "#enqueue_clear_if_ready" do
+    it "enqueues clear job if it was done more than 5 min. ago" do
+      time = Time.now.utc.to_f - ((Mantle::CatchUp::CLEANUP_EVERY_MINUTES + 1) * 60.0)
+      Mantle::LocalRedis.set_catch_up_cleanup(time)
+
+      expect {
+        Mantle::CatchUp.new.enqueue_clear_if_ready
+      }.to change(Mantle::Workers::CatchUpCleanupWorker.jobs, :size).by(1)
+    end
+
+    it "enqueues clear job if no last cleanup time has been recorded" do
+      Mantle::LocalRedis.set_catch_up_cleanup(nil)
+
+      expect {
+        Mantle::CatchUp.new.enqueue_clear_if_ready
+      }.to change(Mantle::Workers::CatchUpCleanupWorker.jobs, :size).by(1)
+    end
+
+    it "doesn't enqueue a clear job if enough time hasn't passed" do
+      time = Time.now.utc.to_f - ((Mantle::CatchUp::CLEANUP_EVERY_MINUTES - 1) * 60.0)
+      Mantle::LocalRedis.set_catch_up_cleanup(time)
+
+      expect {
+        Mantle::CatchUp.new.enqueue_clear_if_ready
+      }.to_not change(Mantle::Workers::CatchUpCleanupWorker.jobs, :size)
+    end
+  end
+
+  describe "#clear_expired" do
+    it "clears expired entries from the catch up list" do
+      cu = Mantle::CatchUp.new
+      cu.add_message("person:update", { id: 1 }, cu.hours_ago_in_seconds(8))
+      cu.add_message("deal:update", { id: 2 }, cu.hours_ago_in_seconds(7))
+      cu.add_message("company:update", { id: 3 }, cu.hours_ago_in_seconds(5))
+
+      cu.clear_expired
+
+      expect(redis.zcount(cu.key, 0, 'inf')).to eq(1)
+
+      json_payload = redis.zrange(cu.key, 0, -1).first
+      channel, message = cu.deserialize_payload(json_payload)
+
+      expect(channel).to eq("company:update")
     end
   end
 
   describe "catch_up" do
     it "raises when redis connection is missing" do
       cu = Mantle::CatchUp.new
+      cu.redis = nil
 
       expect {
         cu.catch_up
       }.to raise_error(Mantle::Error::MissingRedisConnection)
     end
-  end
 
-  describe "#compare_times" do
-    context "when the times are the same" do
-      let(:t1) { 10_000 }
-      let(:t2) { 10_000 }
-      it "is false" do
-        expect(handler.compare_times(t1, t2)).to be_falsey
-      end
+    it "skips if no successfully processed time has been recorded" do
+      cu = Mantle::CatchUp.new
+
+      cu.add_message("person:update", { id: 1 })
+      cu.add_message("deal:update", { id: 2 })
+      cu.add_message("company:update", { id: 3 })
+      time = cu.add_message("user:update", { id: 3 })
+
+      expect(cu).to_not receive(:route_messages)
+
+      cu.catch_up
     end
 
-    context "when the last digit is different" do
-      let(:t1) { 10_000 }
-      let(:t2) { 10_005 }
-      it "is four" do
-        expect(handler.compare_times(t1, t2)).to eq 4
-      end
+    it "doesn't process anything when system is up to date no last successfully processed message time has been record" do
+      cu = Mantle::CatchUp.new
+
+      cu.add_message("person:update", { id: 1 })
+      cu.add_message("deal:update", { id: 2 })
+      cu.add_message("company:update", { id: 3 })
+      time = cu.add_message("user:update", { id: 3 })
+
+      Mantle::LocalRedis.set_message_successfully_received
+
+      expect(cu).to_not receive(:route_messages)
+
+      cu.catch_up
     end
-    context "when the fourth digit is different" do
-      let(:t1) { 10_000 }
-      let(:t2) { 10_050 }
-      it "is three" do
-        expect(handler.compare_times(t1, t2)).to eq 3
-      end
-    end
 
-    context "when the first digit is different" do
-      let(:t1) { 10_000 }
-      let(:t2) { 20_050 }
-      it "is three" do
-        expect(handler.compare_times(t1, t2)).to eq 0
-      end
-    end
-  end
+    it "handles all messages that need catch up" do
+      cu = Mantle::CatchUp.new
 
-  describe "#sort_keys" do
-    let(:keys) { ["action_list:1370533530.12034:contact:update:106", "action_list:1370533458.10278:contact:update:107", "action_list:1370533534.67259:contact:update:103", "action_list:1370533526.42493:contact:update:108"] }
-    let(:sorted_keys) { ["action_list:1370533458.10278:contact:update:107", "action_list:1370533526.42493:contact:update:108", "action_list:1370533530.12034:contact:update:106", "action_list:1370533534.67259:contact:update:103"] }
+      cu.add_message("person:update", { id: 1 })
+      cu.add_message("deal:update", { id: 2 })
+      cu.add_message("company:update", { id: 3 })
 
-    it "sorts the keys" do
-      expect(handler.sort_keys(keys)).to eq sorted_keys
-    end
-  end
+      Mantle::LocalRedis.set_message_successfully_received
 
-  describe "#get_keys_to_catch_up_on" do
-    let(:keys) { ["action_list:1370533530.12034:contact:update:106", "action_list:1370533458.10278:contact:update:107", "action_list:1370533534.67259:contact:update:103", "action_list:1370533526.42493:contact:update:108"] }
-    let(:keys_not_seen) { ["action_list:1370533530.12034:contact:update:106", "action_list:1370533534.67259:contact:update:103"] }
+      time = cu.add_message("user:update", { id: 3 })
 
-    it "finds the right keys" do
-      redis = double("redis")
-      handler.message_bus_redis = redis
+      expect(cu).to receive(:route_messages).with(
+        [["{\"channel\":\"user:update\",\"message\":{\"id\":3}}", time]]
+      )
 
-      allow(handler).to receive(:last_success_time) { Time.at(1370533_529) }
-      allow(Time).to receive(:now) { Time.at(1370533_560) }
-      allow(handler.message_bus_redis).
-        to receive(:keys).with("#{Mantle.configuration.message_bus_catch_up_key_name}:13705335*") { keys_not_seen }
-      expect(handler.get_keys_to_catch_up_on).to eq keys_not_seen
+      cu.catch_up
     end
   end
 
-  describe "#handle_messages_since_last_success" do
-    let(:json) { "\"message\"" }
-    let(:message_router) { double(route: true) }
-    let(:redis) { double(get: json, keys: message) }
-
-    before do
-      handler.message_bus_redis = redis
-      handler.message_bus_channels = ["contact:update"]
-
-      allow(handler).to receive(:last_success_time) { Time.at(1) }
-      allow(Time).to receive(:now) { Time.at(2) }
-      Mantle.logger.level = Logger::WARN
-    end
-
-    context 'message published on channel listed in Mantle.message_bus_channels' do
-      let(:message) { ["action_list:1370533530.12034:contact:update:106"] }
-
-      it "routes the messages" do
-        expect(Mantle::MessageRouter).to receive(:new).with("contact", "update", json).and_return(message_router)
-        handler.catch_up
-      end
-    end
-
-    context 'message published on channel NOT listed in Mantle.message_bus_channels' do
-      let(:message) { ["action_list:1370533530.12034:account:update:1"] }
-
-      it "does not route the message" do
-        expect(Mantle::MessageRouter).to_not receive(:new).with("account", "update", json)
-        handler.catch_up
-      end
+  describe "#last_success_time" do
+    it "returns time of last successfully process message"do
+      expect(Mantle::LocalRedis).to receive(:last_message_successfully_received_at)
+      Mantle::CatchUp.new.last_success_time
     end
   end
+
+  describe "#route_messages" do
+    it "process messages if listening to that channel" do
+      p =[["{\"channel\":\"user:update\",\"message\":{\"id\":3}}", 1423336645.314663]]
+      cu = Mantle::CatchUp.new
+      cu.message_bus_channels = ["user:update"]
+
+      expect(Mantle::MessageRouter).to receive(:new).with(
+        "user:update", { "id" => 3 }
+      ).and_return(double("router", route: true))
+
+      cu.route_messages(p)
+    end
+
+    it "skips messages on channels not subscribed" do
+      p =[["{\"channel\":\"user:update\",\"message\":{\"id\":3}}", 1423336645.314663]]
+      cu = Mantle::CatchUp.new
+      cu.message_bus_channels = ["user:create"]
+
+      expect(Mantle::MessageRouter).to_not receive(:new)
+
+      cu.route_messages(p)
+    end
+  end
+
 end
 

@@ -1,22 +1,16 @@
 module Mantle
   class MessageRouter
-    def initialize(model, action, message)
-      @model, @action, @message = model, action, message
+    def initialize(channel, message)
+      @channel, @message = channel, message
     end
 
     def route
-      return unless message
+      return unless @message
 
-      parsed_json = JSON.parse(message)
+      Mantle.logger.debug("Routing message for #{@channel}")
+      Mantle.logger.debug("Message: #{@message}")
 
-      Mantle.logger.debug("Routing message for #{model}:#{action}")
-      Mantle.logger.debug("Message: #{parsed_json}")
-
-      Mantle::Worker.perform_async(model, action, parsed_json)
+      Mantle::Workers::ProcessWorker.perform_async(@channel, @message)
     end
-
-    private
-
-    attr_reader :action, :model, :message
   end
 end

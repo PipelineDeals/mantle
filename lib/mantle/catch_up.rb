@@ -1,79 +1,84 @@
 module Mantle
   class CatchUp
-    attr_accessor :message_bus_redis, :message_bus_channels
-    attr_reader :message_bus_catch_up_key_name
+    KEY = "mantle:catch_up"
+    HOURS_TO_KEEP = 6
+    CLEANUP_EVERY_MINUTES = 5
+
+    attr_accessor :redis, :message_bus_channels
+    attr_reader :key
 
     def initialize
-      @message_bus_redis = Mantle.configuration.message_bus_redis
-      @message_bus_catch_up_key_name = Mantle.configuration.message_bus_catch_up_key_name
+      @redis = Mantle.configuration.message_bus_redis
       @message_bus_channels = Mantle.configuration.message_bus_channels
+      @key = KEY
     end
 
-    def add_message(channel, message)
-      json = JSON.generate(message)
-      key = Mantle::CatchUp::MessageKey.new(channel)
+    def add_message(channel, message, now = Time.now.utc.to_f)
+      json = serialize_payload(channel, message)
+      redis.zadd(key, now, json)
+      Mantle.logger.debug("Added message to catch up list for channel: #{channel}")
+      now
+    end
 
-      expiration_in_seconds = 6 * 60 # 6 hours
+    def enqueue_clear_if_ready
+      now = Time.now.utc.to_f
+      five_minutes_ago = now - (CLEANUP_EVERY_MINUTES * 60.0)
+      last_cleanup = Mantle::LocalRedis.last_catch_up_cleanup_at
 
-      message_bus_redis.setex(
-        "#{message_bus_catch_up_key_name}:#{key}",
-        expiration_in_seconds,
-        json
-      )
+      if last_cleanup.nil? || last_cleanup < five_minutes_ago
+        Mantle::Workers::CatchUpCleanupWorker.perform_async
+      end
+    end
 
-      Mantle.logger.debug("Added message to catch up list ('#{message_bus_catch_up_key_name}') with key: #{key}")
+    def clear_expired
+      max_time_to_clear = hours_ago_in_seconds(HOURS_TO_KEEP)
+      redis.zremrangebyscore(key, 0 , max_time_to_clear)
     end
 
     def catch_up
-      raise Mantle::Error::MissingRedisConnection unless message_bus_redis
+      raise Mantle::Error::MissingRedisConnection unless redis
 
-      Mantle.logger.info("Initialized catch up on list key: #{message_bus_catch_up_key_name}")
-
-      return if last_success_time.nil?
+      if last_success_time.nil?
+        Mantle.logger.info("Skipping catch up because of missing last processed time...")
+        return
+      end
 
       Mantle.logger.info("Catching up from time: #{last_success_time}")
-      keys = get_keys_to_catch_up_on
-      handle_messages_since_last_success(sort_keys(keys))
-    end
 
-    def sort_keys(keys)
-      keys.sort { |k1, k2| k1.split(":")[1].to_f <=> k2.split(":")[1].to_f }
-    end
-
-    def get_keys_to_catch_up_on
-      sig_length = compare_times(Time.now.to_i.to_s, last_success_time.to_i.to_s)
-      return unless sig_length
-      prefix = last_success_time.to_i.to_s[0, sig_length]
-      message_bus_redis.keys(catch_up_key_names(prefix))
-    end
-
-    def compare_times(t1, t2)
-      t1 = t1.to_s
-      t2 = t2.to_s
-      for i in 0...t1.length do return i if t1[i] != t2[i] end
-      false
-    end
-
-    def catch_up_key_names(prefix)
-      "#{message_bus_catch_up_key_name}:#{prefix}*"
+      payloads_with_time = redis.zrangebyscore(key, last_success_time, 'inf', with_scores: true)
+      route_messages(payloads_with_time) if payloads_with_time.any?
     end
 
     def last_success_time
       LocalRedis.last_message_successfully_received_at
     end
 
-    def handle_messages_since_last_success(keys)
-      keys.each do |key|
-        _, timestamp, model, action, id = key.split(':')
-        if timestamp.to_f > last_success_time.to_f
-          channel = "#{model}:#{action}"
-          message = message_bus_redis.get(key)
+    def route_messages(payloads_with_time)
+      payloads_with_time.each do |payload_with_time|
+        payload, time = payload_with_time
+        channel, message = deserialize_payload(payload)
 
-          if message_bus_channels.include?(channel)
-            Mantle::MessageRouter.new(model, action, message).route
-          end
+        if message_bus_channels.include?(channel)
+          Mantle::MessageRouter.new(channel, message).route
         end
       end
+    end
+
+    def deserialize_payload(payload)
+      res = JSON.parse(payload)
+      [res.fetch("channel"), res.fetch("message")]
+    end
+
+    def hours_ago_in_seconds(hours)
+      hour_seconds = 60 * 60 * hours
+      Time.now.utc.to_f - hour_seconds
+    end
+
+    private
+
+    def serialize_payload(channel, message)
+      payload = { channel: channel, message: message }
+      JSON.generate(payload)
     end
   end
 end
