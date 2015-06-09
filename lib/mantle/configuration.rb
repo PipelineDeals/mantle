@@ -1,5 +1,3 @@
-require 'logger'
-
 module Mantle
   class Configuration
 
@@ -12,16 +10,10 @@ module Mantle
     def initialize
       @message_bus_channels = []
       @message_handler = Mantle::MessageHandler
-      @logger = default_logger
+      @logger = Logger.new
       @redis_namespace = nil
     end
 
-    private
-
-    def default_logger
-      logger = Logger.new(STDOUT)
-      logger.level = Logger::INFO
-      logger
     end
   end
 end
