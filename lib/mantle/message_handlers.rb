@@ -5,23 +5,15 @@ module Mantle
     end
 
     def receive_message(channel, message)
-      each_handler channel do |handler|
-        handler.receive channel, message
+      Array(fetch(channel)).each do |string_handler|
+        Mantle::Workers::MessageHandlerWorker.perform_async(
+          string_handler, channel, message
+        )
       end
     end
 
     def channels
       keys
-    end
-
-    private
-
-    def each_handler(channel)
-      Array(fetch(channel)).each do |handler|
-        yield Object.const_get(handler)
-      end
-    rescue KeyError
-      raise Mantle::Error::ChannelNotFound.new(channel, channels)
     end
   end
 end

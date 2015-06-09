@@ -2,37 +2,26 @@ require 'spec_helper'
 
 describe Mantle::MessageHandlers do
   describe '#receive_message' do
-    context 'given a channel that exists' do
-      it 'delegates the channel and message to the matching handlers' do
-        class_double('FakeHandler').as_stubbed_const
+    it 'enqueues a job for each handler' do
+      channel = "person:create"
+      message = { "id" => 4 }
+      message_handlers = {
+        "person:create" => ['FakeHandler', 'OtherFakeHandler']
+      }
 
-        FakeHandler.singleton_class.send :attr_accessor, :channel, :message
-        FakeHandler.define_singleton_method :receive do |channel, message|
-          self.channel, self.message = channel, message
-        end
+      expect {
+        Mantle::MessageHandlers.new(message_handlers).receive_message(channel, message)
+      }.to change(Mantle::Workers::MessageHandlerWorker.jobs, :size).by(2)
 
-        Mantle::MessageHandlers.new('a_channel' => 'FakeHandler').receive_message(
-          'a_channel', 'a_message'
-        )
+      args = Mantle::Workers::MessageHandlerWorker.jobs[0]["args"]
+      expect(args[0]).to eq("FakeHandler")
+      expect(args[1]).to eq(channel)
+      expect(args[2]).to eq(message)
 
-        expect(FakeHandler).to have_attributes(
-          channel: 'a_channel', message: 'a_message'
-        )
-      end
-    end
-
-    context 'given a channel that does not exist' do
-      it 'raises an error' do
-        expect {
-          Mantle::MessageHandlers.new(
-            'existing_channel' => '',
-            'existing_channel2' => ''
-          ).receive_message 'missing_channel', 'foo'
-        }.to raise_error(
-          Mantle::Error::ChannelNotFound,
-          "'missing_channel' not found. Existing channels: existing_channel, existing_channel2"
-        )
-      end
+      args = Mantle::Workers::MessageHandlerWorker.jobs[1]["args"]
+      expect(args[0]).to eq("OtherFakeHandler")
+      expect(args[1]).to eq(channel)
+      expect(args[2]).to eq(message)
     end
   end
 end
