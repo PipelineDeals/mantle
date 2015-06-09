@@ -1,19 +1,19 @@
 module Mantle
   class Configuration
+    attr_accessor :message_bus_redis,
+                  :logger,
+                  :redis_namespace
 
-    attr_accessor :message_bus_channels,
-      :message_bus_redis,
-      :message_handler,
-      :logger,
-      :redis_namespace
+    attr_reader :message_handlers
 
     def initialize
-      @message_bus_channels = []
-      @message_handler = Mantle::MessageHandler
+      @message_handlers = Mantle::MessageHandlers.new
       @logger = Logger.new
       @redis_namespace = nil
     end
 
+    def message_handlers=(hash_instance)
+      @message_handlers = Mantle::MessageHandlers.new(hash_instance)
     end
   end
 end

@@ -4,7 +4,6 @@ module Mantle
 
     def initialize
       @redis = Mantle.configuration.message_bus_redis
-      @channels = Mantle.configuration.message_bus_channels
     end
 
     def publish(channel, message)
@@ -29,7 +28,7 @@ module Mantle
 
       Mantle.logger.info("Subscribing to message bus for #{channels} ")
 
-      redis.subscribe(channels) do |on|
+      redis.subscribe(Mantle.channels) do |on|
         on.message do |channel, json_message|
           message = JSON.parse(json_message)
           Mantle::MessageRouter.new(channel, message).route
@@ -39,6 +38,6 @@ module Mantle
 
     private
 
-    attr_reader :redis, :channels
+    attr_reader :redis
   end
 end
