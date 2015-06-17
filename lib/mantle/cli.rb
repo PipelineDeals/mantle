@@ -40,11 +40,9 @@ module Mantle
     end
 
     def load_config
-      if options[:config]
-        require File.expand_path(options[:config])
-      else
-        require File.expand_path("./config/initializers/mantle")
-      end
+      require File.expand_path(
+        options.fetch :config, './config/initializers/mantle'
+      )
     end
 
     def configure_sidekiq

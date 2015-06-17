@@ -9,7 +9,7 @@ module Mantle
 
     def initialize
       @redis = Mantle.configuration.message_bus_redis
-      @message_bus_channels = Mantle.configuration.message_bus_channels
+      @message_bus_channels = Mantle.channels
       @key = KEY
     end
 
@@ -32,7 +32,7 @@ module Mantle
 
     def clear_expired
       max_time_to_clear = hours_ago_in_seconds(HOURS_TO_KEEP)
-      redis.zremrangebyscore(key, 0 , max_time_to_clear)
+      redis.zremrangebyscore(key, 0, max_time_to_clear)
     end
 
     def catch_up
@@ -65,8 +65,7 @@ module Mantle
     end
 
     def deserialize_payload(payload)
-      res = JSON.parse(payload)
-      [res.fetch("channel"), res.fetch("message")]
+      JSON(payload).values_at 'channel', 'message'
     end
 
     def hours_ago_in_seconds(hours)
@@ -77,8 +76,7 @@ module Mantle
     private
 
     def serialize_payload(channel, message)
-      payload = { channel: channel, message: message }
-      JSON.generate(payload)
+      JSON({channel: channel, message: message})
     end
   end
 end

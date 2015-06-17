@@ -17,12 +17,12 @@ Setup a Rails initializer(`config/initializers/mantle.rb`):
 
 
 ```Ruby
-require_relative '../../app/models/mantle_message_handler'
-
 Mantle.configure do |config|
-  config.message_bus_channels = %w[account:update orders]
   config.message_bus_redis = Redis.new(host: ENV["MESSAGE_BUS_REDIS_URL"] || 'localhost')
-  config.message_handler = MantleMessageHandler
+  config.message_handlers = {
+    'account:update' => 'MyMessageHandler',
+    'order' => ['MyMessageHandler', 'MyOtherMessageHandler']
+  }
 end
 ```
 
@@ -30,11 +30,10 @@ The config takes a number of options, many of which have defaults:
 
 ```Ruby
 Mantle.configure do |config|
-  config.message_bus_channels = ['deal:update', 'create:person'] # default: []
   config.message_bus_redis = Redis.new(host: 'localhost') # default: localhost
-  config.message_handler = MyMessageHandler # requires implementation
   config.logger = Rails.logger # default: Logger.new(STDOUT)
   config.redis_namespace = "my-namespace" # default: no namespace
+  config.message_handlers = {'deal:update' => 'MyHandler'} # default: {}
 end
 ```
 

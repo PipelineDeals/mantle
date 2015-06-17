@@ -1,35 +1,22 @@
 require 'spec_helper'
 
 describe Mantle::Configuration do
-  it 'can set/get message_bus_channels' do
-    config = Mantle::Configuration.new
-    config.message_bus_channels = ["update"]
-    expect(config.message_bus_channels).to eq(Array("update"))
-  end
-
-  it 'sets default message_bus_channels' do
-    config = Mantle::Configuration.new
-    expect(config.message_bus_channels).to eq([])
-  end
-
   it 'can set/get message_bus_redis' do
     redis = double("redis")
     config = Mantle::Configuration.new
-    config.message_bus_channels = redis
-    expect(config.message_bus_channels).to eq(redis)
+    config.message_bus_redis = redis
+    expect(config.message_bus_redis).to eq(redis)
   end
 
-  it 'can set/get message_handler' do
-    FakeHandler = Class.new
-
+  it 'can set/get message_handlers' do
     config = Mantle::Configuration.new
-    config.message_handler = FakeHandler
-    expect(config.message_handler).to eq(FakeHandler)
+    config.message_handlers = {'a_channel' => 'FakeHandler'}
+    expect(config.message_handlers).to eq({'a_channel' => 'FakeHandler'})
   end
 
   it 'configures default message handler' do
     config = Mantle::Configuration.new
-    expect(config.message_handler).to eq(Mantle::MessageHandler)
+    expect(config.message_handlers).to be_instance_of(Mantle::MessageHandlers)
   end
 
   it 'can set/get logger' do
@@ -55,5 +42,3 @@ describe Mantle::Configuration do
     expect(config.redis_namespace).to eq(nil)
   end
 end
-
-

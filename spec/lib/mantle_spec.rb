@@ -10,9 +10,18 @@ describe Mantle do
   end
 
   describe ".receive_message" do
-    it 'delegates to message handler' do
-      expect(Mantle.configuration.message_handler).to receive(:receive).with("deal:update", {})
-      Mantle.receive_message("deal:update", {})
+    it "delegates to the given channel's message handlers" do
+      class_double('MessageHandler').as_stubbed_const
+      class_double('MessageHandler2').as_stubbed_const
+      message = double('message')
+
+      Mantle.configuration.message_handlers = {
+        'deal:update' => ['MessageHandler', 'MessageHandler2']
+      }
+
+      expect(MessageHandler).to receive(:receive).with 'deal:update', message
+      expect(MessageHandler2).to receive(:receive).with 'deal:update', message
+      Mantle.receive_message 'deal:update', message
     end
   end
 

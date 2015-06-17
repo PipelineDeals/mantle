@@ -9,4 +9,3 @@ describe Mantle::MessageHandler do
     end
   end
 end
-
