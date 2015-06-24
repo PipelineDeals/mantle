@@ -38,6 +38,35 @@ describe Mantle::MessageBus do
   end
 
   describe "#subscribe_to_channels" do
+    context 'properly setup message handlers' do
+      before :each do
+        Mantle.configure do |c|
+          c.message_handlers = {
+          "order" => "OrderHandler",
+          "call" => "CallHandler"
+          }
+        end
+      end
+
+      it "subscribes to channels configured" do
+        redis = double("redis")
+        mb = Mantle::MessageBus.new
+        mb.redis = redis
+
+        expect(redis).to receive(:subscribe).with(["order", "call"]) { true }
+        mb.subscribe_to_channels
+      end
+    end
+
+    it "skips subscription if no channels" do
+      redis = double("redis")
+      mb = Mantle::MessageBus.new
+      mb.redis = redis
+
+      expect(redis).to_not receive(:subscribe) { true }
+      mb.subscribe_to_channels
+    end
+
     it "raises without redis connection" do
       mb = Mantle::MessageBus.new
       mb.redis = nil

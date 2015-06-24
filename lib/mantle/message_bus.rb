@@ -26,7 +26,11 @@ module Mantle
     def subscribe_to_channels
       raise Mantle::Error::MissingRedisConnection unless redis
 
-      Mantle.logger.info("Subscribing to message bus for #{channels} ")
+      if Mantle.channels.any?
+        Mantle.logger.info("Subscribing to message bus for #{Mantle.channels} ")
+      else
+        Mantle.logger.info("No channels configured for subscription. Configure 'message_handlers' if this was unintentional.") and return
+      end
 
       redis.subscribe(Mantle.channels) do |on|
         on.message do |channel, json_message|
