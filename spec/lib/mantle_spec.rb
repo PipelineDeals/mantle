@@ -7,6 +7,12 @@ describe Mantle do
       Mantle.configuration.message_bus_redis = "redis"
       expect(Mantle.configuration.message_bus_redis).to eq("redis")
     end
+
+    it 'allows message_handlers to be set' do
+      handler_config = { "order" => "OrderHandler" }
+      Mantle.configure { |c| c.message_handlers = handler_config }
+      expect(Mantle.configuration.message_handlers).to eq(handler_config)
+    end
   end
 
   describe ".receive_message" do
