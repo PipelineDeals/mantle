@@ -104,3 +104,47 @@ $ bin/sidekiq -q mantle -q default
 
 It will NOT add the `default` queue to processing if there are other queues
 enumerated using the `-q` option.
+
+## Testing
+
+Requiring this library causes messages to be appended to an in-memory array.
+
+```Ruby
+# test/test_helper.rb
+require 'mantle/testing'
+```
+
+```Ruby
+class OrderMessage
+  def perform(message:)
+    Mantle::Message.new("order:create").publish(message)
+  end
+end
+```
+
+```Ruby
+class OrderMessageTest < ActiveSupport::TestCase
+  test "sends a mantle message on created order" do
+    OrderMessage.new.perform(mantle_message)
+    assert_equal 1, Mantle.messages.size
+
+    msg = Mantle.messages.first
+    assert_equal "order:create", msg.channel
+    assert_equal mantle_message, msg.message
+  end
+
+  private
+
+  def mantle_message
+    { id: 5 }
+  end
+end
+```
+
+Be sure to clear out messages so they don't build up during the test suite:
+
+```Ruby
+def teardown
+  Mantle.clear_all
+end
+```
