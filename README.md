@@ -116,7 +116,7 @@ require 'mantle/testing'
 
 ```Ruby
 class OrderMessage
-  def perform(message:)
+  def perform(message)
     Mantle::Message.new("order:create").publish(message)
   end
 end
