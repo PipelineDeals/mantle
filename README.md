@@ -1,6 +1,7 @@
 # Mantle
 
 [![Circle CI](https://circleci.com/gh/PipelineDeals/mantle.svg?style=svg)](https://circleci.com/gh/PipelineDeals/mantle)
+[![Code Climate](https://codeclimate.com/github/PipelineDeals/mantle/badges/gpa.svg)](https://codeclimate.com/github/PipelineDeals/mantle)
 
 ## Installation
 
