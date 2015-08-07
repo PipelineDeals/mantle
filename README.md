@@ -1,5 +1,7 @@
 # Mantle
 
+[![Circle CI](https://circleci.com/gh/PipelineDeals/mantle.svg?style=svg)](https://circleci.com/gh/PipelineDeals/mantle)
+
 ## Installation
 
 Add this line to your application's Gemfile:
