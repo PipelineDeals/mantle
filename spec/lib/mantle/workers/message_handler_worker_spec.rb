@@ -13,5 +13,14 @@ describe Mantle::Workers::MessageHandlerWorker do
       expect(FakeHandler).to receive(:receive).with(channel, message)
       Mantle::Workers::MessageHandlerWorker.new.perform("FakeHandler", channel, message)
     end
+
+    it "handles namespaced handler" do
+      class_double('Namespace::FakeHandler').as_stubbed_const
+      Namespace::FakeHandler.define_singleton_method :receive do |channel, message|
+      end
+
+      expect(Namespace::FakeHandler).to receive(:receive).with(channel, message)
+      Mantle::Workers::MessageHandlerWorker.new.perform("Namespace::FakeHandler", channel, message)
+    end
   end
 end
