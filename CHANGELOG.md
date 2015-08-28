@@ -1,3 +1,8 @@
+2.1.2
+-----------
+
+- `require 'delegate'` to use with `SimpleDelegator`
+
 2.1.1
 -----------
 
