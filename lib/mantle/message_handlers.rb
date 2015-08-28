@@ -1,5 +1,5 @@
 module Mantle
-  class MessageHandlers < SimpleDelegator
+  class MessageHandlers < ::SimpleDelegator
     def initialize(hash_instance = {})
       super hash_instance
     end
