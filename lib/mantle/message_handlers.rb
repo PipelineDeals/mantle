@@ -1,3 +1,5 @@
+require 'delegate'
+
 module Mantle
   class MessageHandlers < ::SimpleDelegator
     def initialize(hash_instance = {})
