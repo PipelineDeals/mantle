@@ -3,6 +3,12 @@
 [![Circle CI](https://circleci.com/gh/PipelineDeals/mantle.svg?style=svg)](https://circleci.com/gh/PipelineDeals/mantle)
 [![Code Climate](https://codeclimate.com/github/PipelineDeals/mantle/badges/gpa.svg)](https://codeclimate.com/github/PipelineDeals/mantle)
 
+To learn more about Mantle and it's internal, see the slide deck below:
+
+<script async class="speakerdeck-embed" data-slide="57"
+data-id="ab3be83df04442f1b49f9e1b2700f6f0" data-ratio="1.33333333333333"
+src="//speakerdeck.com/assets/embed.js"></script>
+
 ## Installation
 
 Add this line to your application's Gemfile:
