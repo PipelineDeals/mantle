@@ -1,7 +1,7 @@
 module Mantle
   class CatchUp
     KEY = "mantle:catch_up"
-    HOURS_TO_KEEP = 6
+    HOURS_TO_KEEP = 1
     CLEANUP_EVERY_MINUTES = 5
 
     attr_accessor :redis, :message_bus_channels

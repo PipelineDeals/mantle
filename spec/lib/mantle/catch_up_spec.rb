@@ -67,9 +67,9 @@ describe Mantle::CatchUp do
   describe "#clear_expired" do
     it "clears expired entries from the catch up list" do
       cu = Mantle::CatchUp.new
-      cu.add_message("person:update", { id: 1 }, cu.hours_ago_in_seconds(8))
-      cu.add_message("deal:update", { id: 2 }, cu.hours_ago_in_seconds(7))
-      cu.add_message("company:update", { id: 3 }, cu.hours_ago_in_seconds(5))
+      cu.add_message("person:update", { id: 1 }, cu.hours_ago_in_seconds(2))
+      cu.add_message("deal:update", { id: 2 }, cu.hours_ago_in_seconds(1))
+      cu.add_message("company:update", { id: 3 }, cu.hours_ago_in_seconds(0.5))
 
       cu.clear_expired
 
