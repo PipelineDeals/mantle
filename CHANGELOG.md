@@ -1,3 +1,8 @@
+2.2.0
+-----------
+
+- Catch up queue is cleared every 60 min.
+
 2.1.2
 -----------
 
