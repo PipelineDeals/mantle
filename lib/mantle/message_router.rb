@@ -16,6 +16,8 @@ module Mantle
         msg = "Unable to process Mantle message\n"
         msg += "#{e.class} #{e}\n"
         msg += "#{e.backtrace.nil? ? '' : e.backtrace.join("\n")}"
+        msg += "Channel: #{@channel}"
+        msg += "Message: #{@message}"
         Mantle.logger.error msg
       end
     end
