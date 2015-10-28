@@ -15,9 +15,9 @@ module Mantle
       rescue => e
         msg = "Unable to process Mantle message\n"
         msg += "#{e.class} #{e}\n"
-        msg += "#{e.backtrace.nil? ? '' : e.backtrace.join("\n")}"
-        msg += "Channel: #{@channel}"
-        msg += "Message: #{@message}"
+        msg += "#{e.backtrace.nil? ? '' : e.backtrace.join("\n")}\n"
+        msg += "Channel => #{@channel}\n"
+        msg += "Message => #{@message}\n"
         Mantle.logger.error msg
       end
     end

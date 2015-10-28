@@ -1,3 +1,8 @@
+2.2.2
+-----------
+
+- Better formatted error messages
+
 2.2.1
 -----------
 
