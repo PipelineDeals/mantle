@@ -1,3 +1,9 @@
+2.2.1
+-----------
+
+- Message router traps exception when enqueuing Sidekiq job and sends to
+    logger
+
 2.2.0
 -----------
 
