@@ -57,5 +57,16 @@ describe Mantle::MessageRouter do
         expect(args.last).to eq(message)
       end
     end
+
+    context "processing malformed messages" do
+      it "logs to error log" do
+        fake_process_worker = Class.new
+        stub_const("Mantle::Workers::ProcessWorker", fake_process_worker)
+        allow(fake_process_worker).to receive(:perform_async) { raise JSON::GeneratorError }
+
+        expect(Mantle.logger).to receive(:error)
+        Mantle::MessageRouter.new("user:login", message).route
+      end
+    end
   end
 end

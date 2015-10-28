@@ -10,7 +10,16 @@ module Mantle
       Mantle.logger.debug("Routing message for #{@channel}")
       Mantle.logger.debug("Message: #{@message}")
 
-      Mantle::Workers::ProcessWorker.perform_async(@channel, @message)
+      begin
+        Mantle::Workers::ProcessWorker.perform_async(@channel, @message)
+      rescue => e
+        msg = "Unable to process Mantle message\n"
+        msg += "#{e.class} #{e}\n"
+        msg += "#{e.backtrace.nil? ? '' : e.backtrace.join("\n")}"
+        msg += "Channel: #{@channel}"
+        msg += "Message: #{@message}"
+        Mantle.logger.error msg
+      end
     end
   end
 end
