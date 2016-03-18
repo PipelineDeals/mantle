@@ -3,7 +3,7 @@ PATH
   specs:
     mantle (2.2.3)
       redis
-      sidekiq
+      sidekiq (~> 4.0)
 
 GEM
   remote: https://rubygems.org/
