@@ -1,6 +1,5 @@
 #!/usr/bin/env ruby
 
-require 'celluloid'
 require 'sidekiq/cli'
 require 'sidekiq/processor'
 

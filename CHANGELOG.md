@@ -1,3 +1,8 @@
+2.2.3
+-----------
+
+- Remove reference to `Celluloid` as Sidekiq no longer depends on it
+
 2.2.2
 -----------
 
