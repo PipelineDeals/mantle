@@ -10,7 +10,7 @@ module Mantle
     end
 
     def publish(message)
-      message = message.merge(message_source: whoami) if whoami
+      message = message.merge(__MANTLE__: { message_source: whoami }) if whoami
       message_bus.publish(channel, message)
       catch_up.add_message(channel, message)
     end
