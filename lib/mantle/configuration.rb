@@ -2,7 +2,8 @@ module Mantle
   class Configuration
     attr_accessor :message_bus_redis,
                   :logger,
-                  :redis_namespace
+                  :redis_namespace,
+                  :whoami
 
     attr_reader :message_handlers
 

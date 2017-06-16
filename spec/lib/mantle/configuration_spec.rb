@@ -14,6 +14,12 @@ describe Mantle::Configuration do
     expect(config.message_handlers).to eq({'a_channel' => 'FakeHandler'})
   end
 
+  it 'can set/get whoami' do
+    config = Mantle::Configuration.new
+    config.whoami = 'SantaClaus'
+    expect(config.whoami).to eq('SantaClaus')
+  end
+
   it 'configures default message handler' do
     config = Mantle::Configuration.new
     expect(config.message_handlers).to be_instance_of(Mantle::MessageHandlers)

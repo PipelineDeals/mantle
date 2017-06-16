@@ -1,3 +1,9 @@
+2.2.4
+-----------
+
+- Add `whoami` to mantle config so an app can tag published messages
+- Add `message_source` as a `__MANTLE__` payload so consumers can identify sender
+
 2.2.3
 -----------
 
