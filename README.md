@@ -154,3 +154,23 @@ def teardown
   Mantle.clear_all
 end
 ```
+
+## Publishing
+
+To publish a new version of this gem:
+
+* Branch off of `master`, commit your changes to this branch (incrementing the `VERSION` constant)
+* Merge branch into `master`
+* Checkout `master` locally and run:
+
+```
+rake build
+gem push pkg/mantle-<new version number>.gem
+```
+
+You will be asked for email address and password credentials for `rubygems.org` - use the `engineering@pipelinedeals.com` credentials
+
+All done! You should see the new version here: https://rubygems.org/gems/mantle
+
+To cut a new github release for this version, click `New Release` from this repo's `Releases` tab.
+
