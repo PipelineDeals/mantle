@@ -1,8 +1,3 @@
-2.3.0
------------
-
-- Requires `sidekiq` versions `5.x` (previous releases required versions `4.x`)
-
 2.2.4
 -----------
 
