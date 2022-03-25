@@ -3,7 +3,8 @@ module Mantle
     attr_accessor :message_bus_redis,
                   :logger,
                   :redis_namespace,
-                  :whoami
+                  :whoami,
+                  :external_store
 
     attr_reader :message_handlers
 

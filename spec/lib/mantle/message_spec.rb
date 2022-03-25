@@ -41,5 +41,31 @@ describe Mantle::Message do
       expect(bus).to have_received(:publish).with(channel, actual_message)
       expect(catch_up).to have_received(:add_message).with(channel, actual_message)
     end
+
+    it "allows external payload store" do
+      Mantle.configure do |config|
+        config.whoami = 'SantaClaus'
+        config.external_store = :redis # or :active_record?
+      end
+      bus = double("message bus")
+      catch_up = double("catch up")
+      channel = "create:person"
+      message = { id: 1 }
+      actual_message = message.merge(__MANTLE__: { message_source: 'SantaClaus' }, external_payload: { external_store: :redis, uuid: 'uuid' })
+
+      external_payload = { some: :really, huge: [ { payload: "containing", misc: "stuff" } ] }
+
+      mantle_message = Mantle::Message.new(channel)
+      mantle_message.message_bus = bus
+      mantle_message.catch_up = catch_up
+
+      allow(bus).to receive(:publish)
+      allow(catch_up).to receive(:add_message)
+
+      mantle_message.publish(message, external_payload)
+
+      expect(bus).to have_received(:publish).with(channel, actual_message)
+      expect(catch_up).to have_received(:add_message).with(channel, actual_message)
+    end
   end
 end

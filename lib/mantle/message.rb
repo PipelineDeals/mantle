@@ -9,8 +9,9 @@ module Mantle
       @catch_up = Mantle::CatchUp.new
     end
 
-    def publish(message)
+    def publish(message, external_payload = nil)
       message = message.merge(__MANTLE__: { message_source: whoami }) if whoami
+      message = message.merge(external_payload: store(external_payload)) if external_payload
       message_bus.publish(channel, message)
       catch_up.add_message(channel, message)
     end
@@ -21,6 +22,10 @@ module Mantle
 
     def whoami
       Mantle.configuration.whoami
+    end
+
+    def store(external_payload)
+      Mantle::ExternalStoreManager.store(external_store: Mantle.configuration.external_store, external_payload: external_payload)
     end
   end
 end
