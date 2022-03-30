@@ -121,7 +121,7 @@ enumerated using the `-q` option.
 Because Mantle uses Redis for the message bus, sending very large messages can quickly use a lot of Redis store,
 and in the event that Redis memory is exceeded, your app will be rendered inoperable. In addition, a Mantle handle may
 need to pass the `message` on to other services (for example, queue processors), passing very large messages can
-compound to even greater memory usage for the same exact payload.
+compound resulting in even greater memory usage for the same exact payload.
 
 For this reason, it sometimes makes sense to send large payloads through an external key/value store where the handler can
 pull in the payload.
