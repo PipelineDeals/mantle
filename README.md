@@ -19,6 +19,8 @@ or install manually by:
 
 ## Usage (in Rails App)
 
+### Configure
+
 Setup a Rails initializer(`config/initializers/mantle.rb`):
 
 
@@ -60,6 +62,7 @@ Mantle.configure do |config|
 end
 ```
 
+### Publish Messages (Publisher)
 
 Publish messages to consumers:
 
@@ -71,6 +74,8 @@ The first and only argument to `Mantle::Message.new` is the channel you want to 
 message on. The `#publish` method takes the message payload (in any format you like)
 and pushes the message on to the message bus pub/sub and also adds it to the
 catch up queue so offline applications can process the message when they become available.
+
+### Receive Messages (Listeners)
 
 Define message handler class with `.receive` method. For example `app/models/my_message_handler.rb`
 
@@ -110,6 +115,60 @@ $ bin/sidekiq -q mantle -q default
 
 It will NOT add the `default` queue to processing if there are other queues
 enumerated using the `-q` option.
+
+### Large Payloads
+
+Because Mantle uses Redis for the message bus, sending very large messages can quickly use a lot of Redis store,
+and in the event that Redis memory is exceeded, your app will be rendered inoperable. In addition, a Mantle handle may
+need to pass the `message` on to other services (for example, queue processors), passing very large messages can
+compound in even greater memory usage.
+
+For this reason, it sometimes makes sense to send large payloads through an external key/value store where the handler can
+pull in the payload.
+
+#### Configuring External Store
+
+Mantle facilitates sending large payloads with limited impact on your message bus memory usage by allowing you to
+configure an external store by adding the following in the initializer.
+
+``` Ruby
+  config.external_store = { redis: Redis.new(host: 'localhost') } # default: no external store
+```
+
+#### Publishing with External Payloads
+
+Consumers expecting external payloads will receive a third argument on the `receive` method:
+
+```Ruby
+Mantle::Message.new("person:create").publish({ id: message['id'], data: message['data'] }, { body: 'large_external_payload' } )
+```
+
+#### Retrieving External Payloads
+
+The consumers will then receive an additional to retrieve that `external_payload` (using the same `external_store` config), by calling:
+
+```Ruby
+class MyMessageHandler
+  def self.receive(channel, message, uuid)
+    puts channel # => 'order'
+    puts message # => { 'id' => 5, 'name' => 'Brandon' }
+    puts external_store_uuid # => ''
+    puts Mantle.retrieve_external_payload(uuid) # => { 'body' => 'large_external_payload' }
+  end
+end
+```
+
+If a consumer is only expecting to receive 2 arguments, then Mantle will detect this (using Ruby reflection), and it
+will retrieve the payload and merge it into the `message`, passing this on to the `receive` method as part of `message`.
+
+```Ruby
+class MyMessageHandler
+  def self.receive(channel, message)
+    puts channel # => 'order'
+    puts message # => { 'id' => 5, 'name' => 'Brandon', 'body' => 'large_external_payload' }
+  end
+end
+```
 
 ## Testing
 
