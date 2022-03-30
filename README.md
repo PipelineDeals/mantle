@@ -75,7 +75,7 @@ message on. The `#publish` method takes the message payload (in any format you l
 and pushes the message on to the message bus pub/sub and also adds it to the
 catch up queue so offline applications can process the message when they become available.
 
-### Receive Messages (Listeners)
+### Receive Messages (Consumer)
 
 Define message handler class with `.receive` method. For example `app/models/my_message_handler.rb`
 
@@ -132,7 +132,11 @@ Mantle facilitates sending large payloads with limited impact on your message bu
 configure an external store by adding the following in the initializer.
 
 ``` Ruby
+Mantle.configure do |config|
+  ...
   config.external_store = { redis: Redis.new(host: 'localhost') } # default: no external store
+  ...
+end
 ```
 
 #### Publishing with External Payloads
