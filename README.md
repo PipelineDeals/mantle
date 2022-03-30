@@ -131,12 +131,44 @@ pull in the payload.
 Mantle facilitates sending large payloads with limited impact on your message bus memory usage by allowing you to
 configure an external store by adding the following in the initializer.
 
+External store can use either `redis` (optionally, a different `Redis` instance) or `ActiveRecord`.
+
+To use `redis` use a hash to configure external store:
+
 ``` Ruby
 Mantle.configure do |config|
   ...
-  config.external_store = { redis: Redis.new(host: 'localhost') } # default: no external store
+  config.external_store = { redis: Redis.new(host: 'localhost') }
   ...
 end
+```
+
+To use `ActiveRecord` use a hash to configure external store:
+
+``` Ruby
+Mantle.configure do |config|
+  ...
+  config.external_store = { table_name: `my_external_payloads`, database: {...} }
+  ...
+end
+```
+
+The `database` hash will be passed to ActiveRecord `establish_connection`.
+
+The `table_name` specified must be a table in the database, and must contain the following columns:
+
+```Ruby
+  create_table :my_external_payloads do |t|
+    t.string :uuid, nil: false
+    t.text :payload, nil: false
+    t.timestamp :keep_until, nil: true
+    t.timestamp :expire_at, nil: true
+    t.timestamp :created_at, nil: false
+  end
+
+  add_index :my_external_payloads, :uuid
+  add_index :my_external_payloads, :expire_at
+  add_index :my_external_payloads, :created_at
 ```
 
 #### Publishing with External Payloads
