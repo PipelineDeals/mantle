@@ -2,6 +2,7 @@ require 'rubygems'
 require 'redis'
 require 'sidekiq'
 require 'json'
+require 'uuidtools'
 
 begin
   require 'pry'

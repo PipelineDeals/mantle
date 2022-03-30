@@ -1,19 +1,26 @@
 module Mantle
   class ExternalStoreManager
-    def self.store(external_store:, external_payload:)
-      classify(external_store).new.store(external_payload)
+    attr_accessor :external_stores
+
+    def configure(external_store, options)
+      instance(external_store).configure(options)
     end
 
-    def self.retriev(external_store:, uuid:_)
-      classify(external_store).new.retrieve(uuid)
+    def store(external_store:, external_payload:)
+      instance(external_store).store(external_payload)
     end
 
-    def self.classify(external_store)
-      builtin_stores[external_store.to_sym] || external_store
+    def retriev(external_store:, uuid:_)
+      instance(external_store).new.retrieve(uuid)
     end
 
-    def self.builtin_stores
-      @builtin_stores ||= {
+    def instance(external_store)
+      @external_stores ||= {}
+      @external_stores[external_store] ||= (builtin_stores[external_store.to_sym] || external_store).new
+    end
+
+    def builtin_stores
+      @@builtin_stores ||= {
         redis: Mantle::ExternalStore::Redis,
         active_record: Mantle::ExternalStore::ActiveRecord
       }

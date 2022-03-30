@@ -1,6 +1,10 @@
 module Mantle
   module ExternalStore
     class ActiveRecord
+      def configure(options)
+        @table = options[:table]
+      end
+
       def store(external_payload)
         # TODO: implement actual store for active_record
         { external_store: :active_record,

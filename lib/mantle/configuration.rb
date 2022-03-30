@@ -3,10 +3,10 @@ module Mantle
     attr_accessor :message_bus_redis,
                   :logger,
                   :redis_namespace,
-                  :whoami,
-                  :external_store
+                  :whoami
 
-    attr_reader :message_handlers
+    attr_reader   :message_handlers,
+                  :external_store_manager
 
     def initialize
       @message_handlers = Mantle::MessageHandlers.new
@@ -16,6 +16,12 @@ module Mantle
 
     def message_handlers=(hash_instance)
       @message_handlers = Mantle::MessageHandlers.new(hash_instance)
+    end
+
+    def external_store=(args)
+      external_store, options = args
+      @external_store_manager ||= Mantle::ExternalStoreManager.new
+      @external_store_manager.configure(external_store, options || {})
     end
   end
 end

@@ -24,8 +24,8 @@ module Mantle
       Mantle.configuration.whoami
     end
 
-    def store(external_payload)
-      Mantle::ExternalStoreManager.store(external_store: Mantle.configuration.external_store, external_payload: external_payload)
+    def store(external_store: external_store, external_payload: external_payload)
+      Mantle.configuration.external_store_manager.store(external_store: external_store, external_payload: external_payload)
     end
   end
 end
