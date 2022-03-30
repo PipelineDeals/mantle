@@ -88,6 +88,8 @@ class MyMessageHandler
 end
 ```
 
+### Listener / Processor
+
 To run the listener:
 
 ```
@@ -173,15 +175,26 @@ The `table_name` specified must be a table in the database, and must contain the
 
 #### Publishing with External Payloads
 
-Consumers expecting external payloads will receive a third argument on the `receive` method:
+An external payload can added to the publish method as using a hash as the third argument. The actual payload is passed as part of the `payload` key.
 
 ```Ruby
-Mantle::Message.new("person:create").publish({ id: message['id'], data: message['data'] }, { body: 'large_external_payload' } )
+Mantle::Message.new("person:create").publish({ id: message['id'], data: message['data'] }, { payload: { body: 'large_external_payload' } } )
+```
+
+There are three ways the `ExternalStoreManager` will free memory.
+- If a `keep_until` parameter is specified, then the payload will not be freed until that time. The payload may outlive the specified time, based on `least recently created`.
+- If an `expire_at` parameter is specified, then the payload will be freed at that time. The payload will not outlive the specified time.
+- If neither qualifier is specified by the publisher, then `least recently created` will be freed, as needed.
+
+```Ruby
+Mantle::Message.new("person:create").publish({ id: message['id'], data: message['data'] }, { payload: { body: 'large_external_payload' }, keep_until: 3.hours.from_now } )
+
+Mantle::Message.new("person:create").publish({ id: message['id'], data: message['data'] }, { payload: { body: 'large_external_payload' }, expire_at: 3.hours.from_now } )
 ```
 
 #### Retrieving External Payloads
 
-The consumers will then receive an additional to retrieve that `external_payload` (using the same `external_store` config), by calling:
+The consumers expeceting an external payload will then receive an additional to retrieve that `external_payload` (using the same `external_store` config), by calling:
 
 ```Ruby
 class MyMessageHandler
