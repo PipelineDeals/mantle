@@ -8,8 +8,7 @@ module Mantle
       def store(external_payload)
         uuid = new_uuid
         @redis.set(uuid, external_payload)
-        { external_store: :redis,
-          uuid: uuid }
+        uuid
       end
 
       def retriev(uuid)

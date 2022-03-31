@@ -1,22 +1,23 @@
 module Mantle
   class ExternalStoreManager
-    attr_accessor :external_stores
-
-    def configure(external_store, options)
-      instance(external_store).configure(options)
+    def configure(external_store_type, options)
+      store_for(external_store_type).configure(options)
     end
 
-    def store(external_store:, external_payload:)
-      instance(external_store).store(external_payload)
+    def store(payload:, keep_for: nil, expires_in: nil)
+      external_store.store(payload)
     end
 
-    def retriev(external_store:, uuid:_)
-      instance(external_store).new.retrieve(uuid)
+    def retriev(uuid:)
+      external_store.retrieve(uuid)
     end
 
-    def instance(external_store)
-      @external_stores ||= {}
-      @external_stores[external_store] ||= (builtin_stores[external_store.to_sym] || external_store).new
+    private
+
+    attr_accessor :external_store
+
+    def store_for(external_store_type)
+      @external_store ||= (builtin_stores[external_store_type] || external_store_type).new
     end
 
     def builtin_stores

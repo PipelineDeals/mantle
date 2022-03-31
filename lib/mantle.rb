@@ -46,6 +46,10 @@ module Mantle
     self.configuration.message_handlers.receive_message channel, message
   end
 
+  def self.external_store_manager
+    configuration.external_store_manager
+  end
+
   def self.channels
     configuration.message_handlers.channels
   end

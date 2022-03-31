@@ -7,8 +7,7 @@ module Mantle
 
       def store(external_payload)
         # TODO: implement actual store for active_record
-        { external_store: :active_record,
-          uuid: 'uuid' }
+        'uuid'
       end
 
       def retriev(uuid)

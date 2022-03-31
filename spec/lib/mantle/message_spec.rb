@@ -7,6 +7,7 @@ describe Mantle::Message do
       catch_up = double("catch up")
       channel = "create:person"
       message = { id: 1 }
+      actual_message = message.merge(__MANTLE__: { sent_at: instance_of(Time) })
 
       mantle_message = Mantle::Message.new(channel)
       mantle_message.message_bus = bus
@@ -15,7 +16,7 @@ describe Mantle::Message do
       allow(bus).to receive(:publish)
       allow(catch_up).to receive(:add_message)
 
-      mantle_message.publish(message)
+      mantle_message.publish(message: message)
 
       expect(bus).to have_received(:publish).with(channel, message)
       expect(catch_up).to have_received(:add_message).with(channel, message)
@@ -27,7 +28,7 @@ describe Mantle::Message do
       catch_up = double("catch up")
       channel = "create:person"
       message = { id: 1 }
-      actual_message = message.merge(__MANTLE__: { message_source: 'SantaClaus' })
+      actual_message = message.merge(__MANTLE__: { sent_at: instance_of(Time), message_source: 'SantaClaus' })
 
       mantle_message = Mantle::Message.new(channel)
       mantle_message.message_bus = bus
@@ -36,7 +37,7 @@ describe Mantle::Message do
       allow(bus).to receive(:publish)
       allow(catch_up).to receive(:add_message)
 
-      mantle_message.publish(message)
+      mantle_message.publish(message: message)
 
       expect(bus).to have_received(:publish).with(channel, actual_message)
       expect(catch_up).to have_received(:add_message).with(channel, actual_message)
@@ -51,9 +52,9 @@ describe Mantle::Message do
       catch_up = double("catch up")
       channel = "create:person"
       message = { id: 1 }
-      actual_message = message.merge(__MANTLE__: { message_source: 'SantaClaus' }, external_payload: { external_store: :redis, uuid: instance_of(String) })
+      actual_message = message.merge(__MANTLE__: { sent_at: instance_of(Time), message_source: 'SantaClaus', uuid: instance_of(String) })
 
-      external_payload = { some: :really, huge: [ { payload: "containing", misc: "stuff" } ] }
+      payload = { some: :really, huge: [ { payload: "containing", misc: "stuff" } ] }
 
       mantle_message = Mantle::Message.new(channel)
       mantle_message.message_bus = bus
@@ -62,7 +63,7 @@ describe Mantle::Message do
       allow(bus).to receive(:publish)
       allow(catch_up).to receive(:add_message)
 
-      mantle_message.publish(message, external_payload: external_payload, external_store: :redis)
+      mantle_message.publish(message: message, payload: payload)
 
       expect(bus).to have_received(:publish).with(channel, actual_message)
       expect(catch_up).to have_received(:add_message).with(channel, actual_message)
