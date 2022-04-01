@@ -16,10 +16,10 @@ describe Mantle::Message do
       allow(bus).to receive(:publish)
       allow(catch_up).to receive(:add_message)
 
-      mantle_message.publish(message: message)
+      mantle_message.publish(message)
 
-      expect(bus).to have_received(:publish).with(channel, message)
-      expect(catch_up).to have_received(:add_message).with(channel, message)
+      expect(bus).to have_received(:publish).with(channel, actual_message)
+      expect(catch_up).to have_received(:add_message).with(channel, actual_message)
     end
 
     it "published message includes message_source" do
@@ -37,7 +37,7 @@ describe Mantle::Message do
       allow(bus).to receive(:publish)
       allow(catch_up).to receive(:add_message)
 
-      mantle_message.publish(message: message)
+      mantle_message.publish(message)
 
       expect(bus).to have_received(:publish).with(channel, actual_message)
       expect(catch_up).to have_received(:add_message).with(channel, actual_message)
@@ -63,7 +63,7 @@ describe Mantle::Message do
       allow(bus).to receive(:publish)
       allow(catch_up).to receive(:add_message)
 
-      mantle_message.publish(message: message, payload: payload)
+      mantle_message.publish(message, payload: payload)
 
       expect(bus).to have_received(:publish).with(channel, actual_message)
       expect(catch_up).to have_received(:add_message).with(channel, actual_message)
