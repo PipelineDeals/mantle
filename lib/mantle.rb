@@ -2,6 +2,7 @@ require 'rubygems'
 require 'redis'
 require 'sidekiq'
 require 'json'
+require 'uuidtools'
 
 begin
   require 'pry'
@@ -11,6 +12,9 @@ end
 require_relative 'mantle/catch_up'
 require_relative 'mantle/configuration'
 require_relative 'mantle/error'
+require_relative 'mantle/external_store_manager'
+require_relative 'mantle/external_store/redis'
+require_relative 'mantle/external_store/active_record'
 require_relative 'mantle/local_redis'
 require_relative 'mantle/logger'
 require_relative 'mantle/message'
@@ -40,6 +44,10 @@ module Mantle
     Mantle.logger.debug("Mantle message: #{message}")
 
     self.configuration.message_handlers.receive_message channel, message
+  end
+
+  def self.external_store_manager
+    configuration.external_store_manager
   end
 
   def self.channels
