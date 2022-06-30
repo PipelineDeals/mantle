@@ -5,14 +5,13 @@ defaults: &defaults
     - image: cimg/ruby:2.6.7
       environment:
         RAILS_ENV: test
+    - image: redis
 
 version: 2
 jobs:
   build:
     <<: *defaults
     steps:
-      - run: sudo apt-get update && sudo apt-get install -y r-base || true
-
       - restore_cache:
           key: v1-mantle-repo-{{ .Environment.CIRCLE_SHA1 }}
 
