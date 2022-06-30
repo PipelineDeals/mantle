@@ -2,7 +2,7 @@ defaults: &defaults
   working_directory: ~/mantle
   parallelism: 1
   docker:
-    - image: circleci/ruby:2.6.2
+    - image: cimg/ruby:2.6.7
       environment:
         RAILS_ENV: test
 
