@@ -1,0 +1,55 @@
+defaults: &defaults
+  working_directory: ~/mantle
+  parallelism: 1
+  docker:
+    - image: circleci/ruby:2.6.2
+      environment:
+        RAILS_ENV: test
+
+version: 2
+jobs:
+  build:
+    <<: *defaults
+    steps:
+      - run: sudo apt-get update && sudo apt-get install -y r-base || true
+
+      - restore_cache:
+          key: v1-mantle-repo-{{ .Environment.CIRCLE_SHA1 }}
+
+      - checkout
+
+      - save_cache:
+          key: v1-mantle-repo-{{ .Environment.CIRCLE_SHA1 }}
+          paths:
+            - ~/mantle
+
+      - restore_cache:
+          key: v1-mantle-bundle-{{ checksum "Gemfile.lock" }}
+
+      - run:
+          name: install bundler
+          command: |
+            gem install bundler:2.1.4
+      - run:
+          name: bundle install
+          command: |
+            bundle install --jobs=4 --retry=3 --path vendor/bundle
+      - save_cache:
+          paths:
+            - ~/mantle/vendor/bundle
+          key: v1-mantle-bundle-{{ checksum "Gemfile.lock" }}
+
+      - run:
+          name: Rspec
+          command: |
+            mkdir /tmp/test-results
+            TEST_FILES="$(circleci tests glob "spec/**/*_spec.rb" | circleci tests split --split-by=timings)"
+            bundle exec rspec --format progress \
+                              --out test_results/rspec.xml \
+                              -- $TEST_FILES
+      - store_test_results:
+          path: test_results
+
+      - store_artifacts:
+          path: test-results/rspec.xml
+          destination: test-results
