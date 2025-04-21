@@ -3,21 +3,21 @@ PATH
   specs:
     mantle (2.3.1)
       redis
-      sidekiq (< 7.0)
+      sidekiq (= 6.5.12)
 
 GEM
   remote: https://rubygems.org/
   specs:
     coderay (1.1.0)
-    connection_pool (2.2.5)
+    connection_pool (2.5.1)
     diff-lcs (1.5.0)
     method_source (0.8.2)
     pry (0.10.0)
       coderay (~> 1.1.0)
       method_source (~> 0.8.1)
       slop (~> 3.4)
-    rack (2.2.6.2)
-    redis (4.7.0)
+    rack (2.2.13)
+    redis (4.8.1)
     rspec (3.12.0)
       rspec-core (~> 3.12.0)
       rspec-expectations (~> 3.12.0)
@@ -33,10 +33,10 @@ GEM
     rspec-support (3.12.0)
     rspec_junit_formatter (0.5.1)
       rspec-core (>= 2, < 4, != 2.12.0)
-    sidekiq (6.5.1)
-      connection_pool (>= 2.2.2)
+    sidekiq (6.5.12)
+      connection_pool (>= 2.2.5, < 3)
       rack (~> 2.0)
-      redis (>= 4.2.0)
+      redis (>= 4.5.0, < 5)
     slop (3.5.0)
 
 PLATFORMS
