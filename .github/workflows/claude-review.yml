@@ -72,4 +72,4 @@ jobs:
             manufacture findings. Reserve detailed comments for real issues.
           track_progress: true
           include_fix_links: true
-          claude_args: "--max-turns 12 --max-budget-usd 0.75"
+          claude_args: "--model claude-sonnet-5 --max-turns 12 --max-budget-usd 0.75"
