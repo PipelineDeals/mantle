@@ -7,7 +7,12 @@
       "Bash(git log:*)",
       "Bash(git fetch:*)",
       "Bash(gh pr view:*)",
-      "Bash(gh pr list:*)"
+      "Bash(gh pr list:*)",
+      "Bash(git push:*)",
+      "Bash(gh pr create:*)",
+      "Bash(gh pr edit:*)",
+      "Bash(gh pr comment:*)",
+      "Bash(gh issue comment:*)"
     ],
     "deny": [
       "Read(./.env)",
@@ -23,7 +28,6 @@
       "Edit(./config/master.key)"
     ],
     "ask": [
-      "Bash(git push:*)",
       "Bash(gh pr merge:*)"
     ]
   },
