@@ -1,0 +1,43 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(bundle exec rspec:*)",
+      "Bash(git status)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)",
+      "Bash(git fetch:*)",
+      "Bash(gh pr view:*)",
+      "Bash(gh pr list:*)"
+    ],
+    "deny": [
+      "Read(./.env)",
+      "Read(./.env.*)",
+      "Read(./config/master.key)",
+      "Read(./config/credentials/**)",
+      "Read(**/*.pem)",
+      "Read(**/*.key)",
+      "Read(**/*.p12)",
+      "Read(**/id_rsa)",
+      "Edit(./.env)",
+      "Edit(./.env.*)",
+      "Edit(./config/master.key)"
+    ],
+    "ask": [
+      "Bash(git push:*)",
+      "Bash(gh pr merge:*)"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/protect-sensitive-files.sh"
+          }
+        ]
+      }
+    ]
+  }
+}
