@@ -1,0 +1,75 @@
+# Claude auto-review: runs on every non-draft PR when opened or marked ready
+# for review; mention @claude in a PR comment to trigger a re-review.
+# Requires the org-level ANTHROPIC_API_KEY secret.
+name: Claude Code
+
+on:
+  pull_request:
+    types: [opened, ready_for_review]
+  issue_comment:
+    types: [created]
+  pull_request_review_comment:
+    types: [created]
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+  actions: read
+  id-token: write
+
+jobs:
+  claude:
+    if: |
+      (github.event_name == 'pull_request' && github.event.pull_request.draft == false) ||
+      (github.event_name == 'issue_comment' && github.event.issue.pull_request && contains(github.event.comment.body, '@claude')) ||
+      (github.event_name == 'pull_request_review_comment' && contains(github.event.comment.body, '@claude'))
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Acknowledge comment
+        # Only comment events carry github.event.comment; skip on pull_request
+        if: github.event_name != 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            if (context.eventName === 'pull_request_review_comment') {
+              await github.rest.reactions.createForPullRequestReviewComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: context.payload.comment.id,
+                content: 'eyes'
+              });
+            } else {
+              await github.rest.reactions.createForIssueComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: context.payload.comment.id,
+                content: 'eyes'
+              });
+            }
+      - uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          prompt: |
+            Review this PR for a Pipeline CRM Ruby service. Focus on:
+            - Bugs or logic errors
+            - Account/tenant isolation — queries must scope by account_id;
+              flag unscoped find/where that could leak data across accounts
+            - Performance: N+1 queries, missing indexes, unbounded/unpaginated
+              queries, external calls (Redis, DB, HTTP) inside loops
+            - Sidekiq jobs: idempotent and safe to retry; pass record IDs, not
+              serialized objects
+            - Convention violations per this repo's CLAUDE.md, if present
+
+            You have full repo access. Read any files you need to verify your findings.
+            Only flag issues introduced by this PR, not pre-existing patterns.
+            Be concise. If the code is sound, say so in 2-3 sentences — do not
+            manufacture findings. Reserve detailed comments for real issues.
+          track_progress: true
+          include_fix_links: true
+          claude_args: "--model claude-sonnet-5 --max-turns 12 --max-budget-usd 0.75"
