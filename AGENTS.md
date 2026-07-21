@@ -1,4 +1,4 @@
-# CLAUDE.md — mantle
+# AGENTS.md — mantle
 
 Context file for AI agents and new developers. Verify against the code before
 relying on it; flag anything stale in a PR.
