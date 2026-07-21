@@ -25,7 +25,21 @@
       "Read(**/id_rsa)",
       "Edit(./.env)",
       "Edit(./.env.*)",
-      "Edit(./config/master.key)"
+      "Edit(./config/master.key)",
+      "Read(**/id_ed25519)",
+      "Edit(**/id_ed25519)",
+      "Read(**/*.pfx)",
+      "Edit(**/*.pfx)",
+      "Read(**/credentials.json)",
+      "Edit(**/credentials.json)",
+      "Read(**/secrets.json)",
+      "Edit(**/secrets.json)",
+      "Read(**/secrets.yml)",
+      "Edit(**/secrets.yml)",
+      "Read(**/secrets.yaml)",
+      "Edit(**/secrets.yaml)",
+      "Read(**/credentials.yml.enc)",
+      "Edit(**/credentials.yml.enc)"
     ],
     "ask": [
       "Bash(gh pr merge:*)"
