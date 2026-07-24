@@ -1,0 +1,23 @@
+name: Security
+
+# Thin shim — gitleaks + the dependency SLA gate live in the org-wide reusable
+# workflow (pipeline_deals/.github/workflows/security-reusable.yml). This file
+# owns only triggers + concurrency; behavior inherits the reusable's defaults.
+
+on:
+  pull_request:
+    types: [opened, ready_for_review, synchronize, reopened]
+
+# Superseding pushes cancel in-flight scans (a cancelled scan leaves no
+# misleading state — the newer commit re-scans).
+concurrency:
+  group: security-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  security:
+    uses: PipelineDeals/pipeline_deals/.github/workflows/security-reusable.yml@master
+    secrets: inherit
