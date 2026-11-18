@@ -7,7 +7,7 @@ defaults: &defaults
         RAILS_ENV: test
     - image: redis
 
-version: 2
+version: 2.1
 jobs:
   build:
     <<: *defaults
